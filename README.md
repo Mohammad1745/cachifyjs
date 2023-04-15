@@ -32,7 +32,7 @@ function getData () {
 
     const cacheConfig = {
         key: `product/list?status=active`,
-        handleCacheCallbackError,
+        handleErrorCallback: handleError,
         postSync: {
             callback: handleResponse,
             syncTimeout: 1, //time in milliseconds
@@ -52,7 +52,7 @@ function handleResponse (response) {
     //handle api response here
 }
 
-function handleCacheCallbackError (error) {
-    //handle if callback has any error like: authentication error
+function handleError (error) {
+    //handle if any error occurs during data refreshing on api call (ex: authentication error)
 }
 ```
