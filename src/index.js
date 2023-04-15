@@ -2,7 +2,7 @@ import axios from "axios";
 
 class CachifyJS {
     axiosConfig;
-    handleCacheCallbackError;
+    handleErrorCallback;
     preSync;
     postSync;
     key;
@@ -10,7 +10,7 @@ class CachifyJS {
 
     constructor() {
         this.axiosConfig = null;
-        this.handleCacheCallbackError = null;
+        this.handleErrorCallback = null;
         this.preSync = null;
         this.postSync = null;
         this.key = null;
@@ -54,7 +54,7 @@ class CachifyJS {
 
     setup(axiosConfig, cacheConfig) {
         this.axiosConfig = axiosConfig;
-        this.handleCacheCallbackError = cacheConfig.handleCacheCallbackError;
+        this.handleErrorCallback = cacheConfig.handleErrorCallback;
         this.preSync = cacheConfig.preSync;
         this.postSync = cacheConfig.postSync;
         this.key = cacheConfig.key;
@@ -70,8 +70,8 @@ class CachifyJS {
                 throw new Error(response.response);
             }
         } catch (error) {
-            if (this.handleCacheCallbackError) {
-                this.handleCacheCallbackError(error);
+            if (this.handleErrorCallback) {
+                this.handleErrorCallback(error);
             }
             else {
                 throw new Error(error);
