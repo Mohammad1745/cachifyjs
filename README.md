@@ -12,8 +12,8 @@ npm install hardcache
 
 ## Usage
 To use HardCache, you need to import it into your JavaScript file and pass your API call to the get function.
-The get function will first check if the API response is already cached in local storage. If it is, it will 
-return the cached data and make the api call, cache the response and run the callback. If not, it will make 
+The get function will first check if the API response is already cached in local storage. If it is, it will
+return the cached data and make the api call, cache the response and run the callback. If not, it will make
 the API call, cache the response in local storage, and return the data.
 
 Here's an example:
@@ -35,7 +35,7 @@ function getData () {
         key: `product/list?status=active`,
         handleCacheCallbackError,
         postSync: {
-            callback,
+            callback: handleResponse,
             syncTimeout: 1, //time in milliseconds
             syncInterval: 1000 * 60 * 60 * 3, //time in milliseconds
         },
@@ -43,14 +43,13 @@ function getData () {
     try {
         //get request only
         let response = await hardCache.get (axiosConfig, cacheConfig)
-
-        //handle you api response
+        handleResponse (response)
     } catch (error) {
         //handle error
     }
 }
 
-function callback (response) {
+function handleResponse (response) {
     //handle api response here
 }
 
