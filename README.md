@@ -42,7 +42,7 @@ function getData () {
     }
     try {
         //get request only
-        let response = await hardCache.request(axiosConfig, cacheConfig)
+        let response = await hardCache.get (axiosConfig, cacheConfig)
 
         //handle you api response
     } catch (error) {
