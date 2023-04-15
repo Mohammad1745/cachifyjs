@@ -1,5 +1,5 @@
 {
-  "name": "hardcache",
+  "name": "cachifyjs",
   "version": "1.0.2",
   "type": "module",
   "description": "hard cache is a  js package to cache api responses and call them automaticly and repeatedly. That can be controller by parameters.",
