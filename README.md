@@ -32,7 +32,7 @@ function getData () {
 
     const cacheConfig = {
         key: `product/list?status=active`,
-        handleErrorCallback: handleError,
+        errorCallback: handleError,
         postSync: {
             callback: handleResponse,
             syncTimeout: 1, //time in milliseconds
