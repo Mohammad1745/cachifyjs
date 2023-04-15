@@ -53,6 +53,6 @@ function handleResponse (response) {
 }
 
 function handleError (error) {
-    //handle if any error occurs during api call like: authentication error
+    //handle if any error occurs during data refreshing on api call (ex: authentication error)
 }
 ```
