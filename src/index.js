@@ -1,6 +1,6 @@
 import axios from "axios";
 
-class Cachify {
+class CachifyJS {
     axiosConfig;
     handleCacheCallbackError;
     preSync;
@@ -135,4 +135,4 @@ class Cachify {
         }
     }
 };
-export default Cachify;
+export default CachifyJS;
