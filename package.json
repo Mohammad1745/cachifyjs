@@ -1,6 +1,6 @@
 {
-  "name": "hard_cache",
-  "version": "1.0.3",
+  "name": "hardcache",
+  "version": "1.0.0",
   "type": "module",
   "description": "hard cache is a  js package to cache api responses and call them automaticly and repeatedly. That can be controller by parameters.",
   "main": "src/index.js",
