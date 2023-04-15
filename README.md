@@ -7,7 +7,7 @@ performance of your frontend application.
 ## Installation
 
 ```
-npm install casifyjs
+npm install cachifyjs
 ```
 
 ## Usage
@@ -18,8 +18,7 @@ the API call, cache the response in local storage, and return the data.
 
 Here's an example:
 ```
-import axios from "axios";
-import CachifyJS from "casifyjs";
+import CachifyJS from "cachifyjs";
 
 function getData () {
     //make object from CachifyJS class
