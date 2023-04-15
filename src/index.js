@@ -127,7 +127,7 @@ class HardCache {
     getData (key)  {
         try {
             let data = localStorage.getItem(key);
-            if (data && data.length) return JSON.parse(data);
+            if (data) return JSON.parse(data);
             return {message: "Data not found"};
         } catch (e) {
             localStorage.removeItem(this.key);
