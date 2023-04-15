@@ -1,6 +1,6 @@
 import axios from "axios";
 
-class CacheService {
+class HardCache {
     axiosConfig;
     handleCacheCallbackError;
     preSync;
@@ -135,4 +135,4 @@ class CacheService {
         }
     }
 };
-export default CacheService;
+export default HardCache;
