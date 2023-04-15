@@ -17,7 +17,7 @@ class HardCache {
         this.response = {};
     }
 
-    async request(axiosConfig, cacheConfig) {
+    async get (axiosConfig, cacheConfig) {
         if (!cacheConfig || axiosConfig.method !== "GET") {
             return null;
         }
