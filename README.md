@@ -77,7 +77,7 @@ When using CachifyJS, you can configure various options to customize the caching
 
 ## Key Points
 1. A single cachifyjs object can handle single api call at a time.
-2. If multiple api call need to be cached at the same time. Make multiple objects.
+2. If multiple api call need to be cached at the same time, create multiple objects.
 3. For multiple api call,
 ```
 import CachifyJS from "cachifyjs";
@@ -167,7 +167,7 @@ in both scenario.
    Different configurations:
    1. `syncTimeout`: The time delay after that api call will be made. It's a one time call.
    2. `syncInterval`: The time interval for the api call. It's a repetitive process. It works in background.
-    
+
 ## Conclusion
 CachifyJS is a simple yet powerful tool that can help you optimize your frontend application's performance 
 by reducing the number of API requests. By caching API responses in the browser's local storage,

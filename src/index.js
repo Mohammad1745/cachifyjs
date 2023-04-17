@@ -28,7 +28,7 @@ class CachifyJS {
             this.response.data = this.getData(this.key);
         } else {
             this.response.data = this.getData(this.key);
-            if (!this.response.data.success) {
+            if (this.response.data.nodata) {
                 await this.refreshData();
                 this.response.data = this.getData(this.key);
             } else if (this.postSync && this.postSync.syncTimeout) {
@@ -128,10 +128,10 @@ class CachifyJS {
         try {
             let data = localStorage.getItem(key);
             if (data) return JSON.parse(data);
-            return {message: "Data not found"};
+            return {message: "Data not found",nodata:true};
         } catch (e) {
             localStorage.removeItem(this.key);
-            return {message: "Data not found"};
+            return {message: "Data not found",nodata:true};
         }
     }
 };
