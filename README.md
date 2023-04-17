@@ -62,7 +62,7 @@ When using CachifyJS, you can configure various options to customize the caching
 
 - `key`: (required) A string that uniquely identifies the API endpoint being called. This key is used as the key for caching the response in local storage.
 
-- `errorCallback`: (optional) A callback function that will be called if an error occurs during the API call. This can be used to handle errors such as authentication failures.
+- `errorCallback`: (required) A callback function that will be called if an error occurs during the API call. This can be used to handle errors such as authentication failures.
 
 - `preSync`: (optional) A boolean that simply enables caching after getting api response and then sending data to frontend.
 
@@ -81,6 +81,7 @@ When using CachifyJS, you can configure various options to customize the caching
 3. For multiple api call,
 ```
 import CachifyJS from "cachifyjs";
+import axios from "axios";
 
 function getData () {
     const axiosConfig = {
@@ -107,7 +108,9 @@ function makeRequest (axiosConfig, cacheConfig=null) {
     let cachifyjs = new CachifyJS()
     try {
         //get request only
-        let response = await cachifyjs.get (axiosConfig, cacheConfig)
+        let response = cacheConfig ? 
+            await cachifyjs.get (axiosConfig, cacheConfig)
+            : axios(axiosConfig)
         return response;
     } catch (error) {
         //handle error
@@ -128,6 +131,43 @@ function handleError (error) {
 }
 ```
 
+## Scenarios
+
+1. `Plain`: `CachifyJS` will try to get data from cache. If data found no api call will be made. Otherwise,
+    it will make the api call and return the response. The `cacheConfig` should look like,
+    ```
+    const cacheConfig = {
+       key: `product/list?status=active`,
+       errorCallback: handleError
+    }
+    ```
+2. `preSync`: `CachifyJS` will make the api call, cache the response and return the response. 
+    The `cacheConfig` should look like,
+    ```
+    const cacheConfig = {
+       key: `product/list?status=active`,
+       errorCallback: handleError,
+       preSync: true,
+    }
+    ```
+3. `postSync`: `CachifyJS` will try to get data from cache. If data not found, and immediate api call will be made. Otherwise,
+it will make the api call and return the response according to the `syncTimeout` or `syncInterval` value. Data will be cached 
+in both scenario.
+    ```
+    const cacheConfig = {
+       key: `product/list?status=active`,
+       errorCallback: handleError,
+       postSync: {
+           callback: handleResponse,
+           syncTimeout: 1, //time in milliseconds
+           syncInterval: 1000 * 60 * 60 * 3, //time in milliseconds
+       },
+    }
+    ```
+   Different configurations:
+   1. `syncTimeout`: The time delay after that api call will be made. It's a one time call.
+   2. `syncInterval`: The time interval for the api call. It's a repetitive process. It works in background.
+    
 ## Conclusion
 CachifyJS is a simple yet powerful tool that can help you optimize your frontend application's performance 
 by reducing the number of API requests. By caching API responses in the browser's local storage,
