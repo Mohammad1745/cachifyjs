@@ -1,12 +1,19 @@
 {
   "name": "cachifyjs",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "type": "module",
   "description": "CachifyJS is a  js package to cache api responses and call them automatically and repeatedly. That can be controlled by parameters.",
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "keywords": [
+    "cache",
+    "API",
+    "local storage",
+    "frontend",
+    "performance"
+  ],
   "author": "Mohammad Ali",
   "license": "MIT",
   "dependencies": {

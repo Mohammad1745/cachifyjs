@@ -1,6 +1,6 @@
 # CachifyJS
 
-CachifyJS is a lightweight npm package that helps you cache API responses in the browser's local storage.
+CachifyJS is a lightweight framework-agnostic npm package that helps you cache API responses in the browser's local storage.
 By caching API responses, you can reduce the number of network requests and improve the
 performance of your frontend application.
 
@@ -66,7 +66,7 @@ When using CachifyJS, you can configure various options to customize the caching
 
 - `preSync`: (optional) A boolean that simply enables caching after getting api response and then sending data to frontend.
 
-- `postSync`: (optional) An object that defines how the cache should be updated after the API response is returned. This is useful when you want to keep the cache up to date with new data periodically.
+- `postSync`: (recommended) An object that defines how the cache should be updated after the API response is returned. This is useful when you want to keep the cache up to date with new data periodically.
 
   - `callback`: (required) A callback function that will be called with the API response after it has been cached.
 
@@ -110,7 +110,7 @@ function makeRequest (axiosConfig, cacheConfig=null) {
         //get request only
         let response = cacheConfig ? 
             await cachifyjs.get (axiosConfig, cacheConfig)
-            : axios(axiosConfig)
+            : await axios(axiosConfig)
         return response;
     } catch (error) {
         //handle error
@@ -133,7 +133,7 @@ function handleError (error) {
 
 ## Scenarios
 
-1. `Plain`: `CachifyJS` will try to get data from cache. If data found no api call will be made. Otherwise,
+1. `Plain`: `CachifyJS` will try to get data from cache. If data found, no api call will be made. Otherwise,
     it will make the api call and return the response. The `cacheConfig` should look like,
     ```
     const cacheConfig = {
@@ -150,7 +150,7 @@ function handleError (error) {
        preSync: true,
     }
     ```
-3. `postSync`: `CachifyJS` will try to get data from cache. If data not found, and immediate api call will be made. Otherwise,
+3. `postSync`: `CachifyJS` will try to get data from cache. If data not found, an immediate api call will be made. Otherwise,
 it will make the api call and return the response according to the `syncTimeout` or `syncInterval` value. Data will be cached 
 in both scenario.
     ```
