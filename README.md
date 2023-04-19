@@ -196,4 +196,4 @@ you can improve your application's response time and make it more responsive to 
 Give it a try in your next project!
 
 
-<a href="https://mail.google.com/mail/?view=cm&fs=1&tf=1&to=mdali2016.227@gmail.com&su=Feedback about cachifyjs">Give Us Your Feedback</a>
+<a href="https://mail.google.com/mail/?view=cm&fs=1&tf=1&to=mdali2016.227@gmail.com&su=Feedback about cachifyjs" target="_blank">Give Us Your Feedback</a>
