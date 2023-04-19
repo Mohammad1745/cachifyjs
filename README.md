@@ -23,7 +23,7 @@ npm install cachifyjs
   and slower performance. It's recommended to experiment with different values to find the appropriate lifetime that balances between freshness and performance.
 
 
-## Usage
+## How To Use
 To use CachifyJS, you need to import it into your JavaScript file and pass your API call to the `get` function.
 The `get` function will first check if the API response is already cached in local storage. If it is, it will
 return the cached data and make the api call, cache the response and run the callback. If not, it will make
@@ -194,4 +194,4 @@ by reducing the number of API requests. By caching API responses in the browser'
 you can improve your application's response time and make it more responsive to user interactions.
 Give it a try in your next project!
 
-[Give Us Your Feedback](mailto:mdali2016.227@gmail.com)
+<a href="mailto:mdali2016.227@gmail.com?subject=Feedback about cachifyjs">Give Us Your Feedback</a>
