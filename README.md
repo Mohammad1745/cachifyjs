@@ -194,4 +194,4 @@ by reducing the number of API requests. By caching API responses in the browser'
 you can improve your application's response time and make it more responsive to user interactions.
 Give it a try in your next project!
 
-<a href="mailto:mdali2016.227@gmail.com?subject=Feedback about cachifyjs">Give Us Your Feedback</a>
+<a href="mailto:mdali2016.227@gmail.com?subject=Feedback about cachifyjs" target="_blank">Give Us Your Feedback</a>
