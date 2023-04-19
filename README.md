@@ -10,6 +10,19 @@ performance of your frontend application.
 npm install cachifyjs
 ```
 
+## What's new! (v1.2)
+- `lifetime`
+
+  This is an optional property that specifies the amount of time in milliseconds that the cached response should be considered valid. After this time has elapsed, the cache will be invalidated, and
+  subsequent requests will trigger a new network call to retrieve the latest data.
+
+  The `lifetime` property is useful in situations where the data being cached may become stale or outdated after
+  a certain amount of time. By setting an appropriate lifetime, you can ensure that the cached data is still relevant and useful to your application.
+
+  It's important to note that setting a longer lifetime value can result in stale data being displayed to the user, while setting a shorter lifetime value can result in more frequent network calls
+  and slower performance. It's recommended to experiment with different values to find the appropriate lifetime that balances between freshness and performance.
+
+
 ## Usage
 To use CachifyJS, you need to import it into your JavaScript file and pass your API call to the `get` function.
 The `get` function will first check if the API response is already cached in local storage. If it is, it will
@@ -58,18 +71,6 @@ function handleError (error) {
     //handle if any error occurs during data refreshing on api call (ex: authentication error)
 }
 ```
-
-## What's new! (v1.2)
-- `lifetime`
-
-    This is an optional property that specifies the amount of time in milliseconds that the cached response should be considered valid. After this time has elapsed, the cache will be invalidated, and 
-    subsequent requests will trigger a new network call to retrieve the latest data. 
-  
-    The `lifetime` property is useful in situations where the data being cached may become stale or outdated after 
-    a certain amount of time. By setting an appropriate lifetime, you can ensure that the cached data is still relevant and useful to your application.
-    
-    It's important to note that setting a longer lifetime value can result in stale data being displayed to the user, while setting a shorter lifetime value can result in more frequent network calls 
-    and slower performance. It's recommended to experiment with different values to find the appropriate lifetime that balances between freshness and performance.
 
 ## Configuration
 When using CachifyJS, you can configure various options to customize the caching behavior. The `cacheConfig` object passed to the `get` function accepts the following properties:
