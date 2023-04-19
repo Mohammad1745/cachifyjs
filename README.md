@@ -188,10 +188,12 @@ in both scenario.
    1. `syncTimeout`: The time delay after that api call will be made. It's a one time call.
    2. `syncInterval`: The time interval for the api call. It's a repetitive process. It works in background.
 
+
 ## Conclusion
 CachifyJS is a simple yet powerful tool that can help you optimize your frontend application's performance 
 by reducing the number of API requests. By caching API responses in the browser's local storage,
 you can improve your application's response time and make it more responsive to user interactions.
 Give it a try in your next project!
 
-<a href="mailto:mdali2016.227@gmail.com?subject=Feedback about cachifyjs" target="_blank">Give Us Your Feedback</a>
+
+<a href="https://mail.google.com/mail/?view=cm&fs=1&tf=1&to=mdali2016.227@gmail.com&su=Feedback about cachifyjs">Give Us Your Feedback</a>
