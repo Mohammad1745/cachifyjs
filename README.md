@@ -11,19 +11,26 @@ npm install cachifyjs
 ```
 
 ## What's new! (v1.2)
+
 - `lifetime`
 
-  This is an optional property that specifies the amount of time in milliseconds that the cached response should be considered valid. After this time has elapsed, the cache will be invalidated, and
-  subsequent requests will trigger a new network call to retrieve the latest data.
+    This is an optional property that specifies the amount of time in milliseconds that the cached response should be considered valid. After this time has elapsed, the cache will be invalidated, and
+    subsequent requests will trigger a new network call to retrieve the latest data.
+    
+    The `lifetime` property is useful in situations where the data being cached may become stale or outdated after
+    a certain amount of time. By setting an appropriate lifetime, you can ensure that the cached data is still relevant and useful to your application.
+    
+    It's important to note that setting a longer lifetime value can result in stale data being displayed to the user, while setting a shorter lifetime value can result in more frequent network calls
+    and slower performance. It's recommended to experiment with different values to find the appropriate lifetime that balances between freshness and performance.
 
-  The `lifetime` property is useful in situations where the data being cached may become stale or outdated after
-  a certain amount of time. By setting an appropriate lifetime, you can ensure that the cached data is still relevant and useful to your application.
+- `Time Specifier`
 
-  It's important to note that setting a longer lifetime value can result in stale data being displayed to the user, while setting a shorter lifetime value can result in more frequent network calls
-  and slower performance. It's recommended to experiment with different values to find the appropriate lifetime that balances between freshness and performance.
+    Time specifier allows to set values of `lifetime`, `syncTimeout` or `syncInterval` properties. Let's say we need to set lifetime
+    of a cache by 3 hours. Previously the value was like `1000 * 60 * 60 * 3`. instead, now we can simply pass the value as `'3h'`.
+    Currently available time specifiers are `s,m,h,d,w` for seconds, minutes, hours, days and weeks respectively.
 
 
-## How To Use
+## Guides
 To use CachifyJS, you need to import it into your JavaScript file and pass your API call to the `get` function.
 The `get` function will first check if the API response is already cached in local storage. If it is, it will
 return the cached data and make the api call, cache the response and run the callback. If not, it will make
@@ -33,29 +40,30 @@ Here's an example:
 ```
 import CachifyJS from "cachifyjs";
 
-function getData () {
-    //make object from CachifyJS class
-    let cachifyjs = new CachifyJS()
-
-    const axiosConfig = {
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-        url: `https://www.yoursite.com/api/product/list?status=active`
-    }
-
-    const cacheConfig = {
-        key: `product/list?status=active`,
-        errorCallback: handleError,
-        lifetime: 1000 * 60 * 60, //time in milliseconds
-        postSync: {
-            callback: handleResponse,
-            syncTimeout: 1, //time in milliseconds
-            syncInterval: 1000 * 60 * 60 * 3, //time in milliseconds
-        },
-    }
+function getProductList () {
     
     try {
-        //get request only
+        //make object from CachifyJS class
+        let cachifyjs = new CachifyJS()
+    
+        const axiosConfig = {
+            method: "GET",
+            headers: { Authorization: `Bearer ${token}` },
+            url: `https://www.yoursite.com/api/product/list?status=active`
+        }
+    
+        const cacheConfig = {
+            key: `product/list?status=active`,
+            errorCallback: handleError,
+            lifetime: '1h',
+            postSync: {
+                callback: handleResponse,
+                syncTimeout: 1, //default (ms)
+                syncInterval: '3h', //with time specifier
+            },
+        }
+        
+        //GET request only
         let response = await cachifyjs.get (axiosConfig, cacheConfig)
         handleResponse (response)
     } catch (error) {
@@ -85,12 +93,12 @@ When using CachifyJS, you can configure various options to customize the caching
 
 - `postSync`: (recommended) An object that defines how the cache should be updated after the API response is returned. This is useful when you want to keep the cache up to date with new data periodically.
 
-  - `callback`: (required) A callback function that will be called with the API response after it has been cached.
+    - `callback`: (required) A callback function that will be called with the API response after it has been cached.
 
-  - `syncTimeout`: (optional) The number of milliseconds to wait before syncing the cache with new data. This is useful if you want to avoid syncing the cache too frequently.
-                    It's a one time call.
+    - `syncTimeout`: (optional) The number of milliseconds to wait before syncing the cache with new data. This is useful if you want to avoid syncing the cache too frequently.
+      It's a one time call.
 
-  - `syncInterval`: (optional) The number of milliseconds to wait before syncing the cache again. This is useful if you want to periodically update the cache with new data.
+    - `syncInterval`: (optional) The number of milliseconds to wait before syncing the cache again. This is useful if you want to periodically update the cache with new data.
 
 ## Key Points
 1. A single cachifyjs object can handle single api call at a time.
@@ -100,7 +108,7 @@ When using CachifyJS, you can configure various options to customize the caching
 import CachifyJS from "cachifyjs";
 import axios from "axios";
 
-function getData () {
+function getProductList () {
     const axiosConfig = {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
@@ -110,11 +118,11 @@ function getData () {
     const cacheConfig = {
         key: `product/list?status=active`,
         errorCallback: handleError,
-        lifetime: 1000 * 60 * 60, //time in milliseconds
+        lifetime: '1h',
         postSync: {
             callback: handleResponse,
-            syncTimeout: 1, //time in milliseconds
-            syncInterval: 1000 * 60 * 60 * 3, //time in milliseconds
+            syncTimeout: 1,
+            syncInterval: '3h', 
         },
     }
     
@@ -123,10 +131,11 @@ function getData () {
 }
 
 function makeRequest (axiosConfig, cacheConfig=null) {
-    //make object from CachifyJS class
-    let cachifyjs = new CachifyJS()
     try {
-        //get request only
+        //make object from CachifyJS class
+        let cachifyjs = new CachifyJS()
+        
+        //GET request only
         let response = cacheConfig ? 
             await cachifyjs.get (axiosConfig, cacheConfig)
             : await axios(axiosConfig)
@@ -153,15 +162,16 @@ function handleError (error) {
 ## Scenarios
 
 1. `Plain`: `CachifyJS` will try to get data from cache. If data found, no api call will be made. Otherwise,
-    it will make the api call and return the response. The `cacheConfig` should look like,
+   it will make the api call and return the response. The `cacheConfig` should look like,
     ```
     const cacheConfig = {
-       key: `product/list?status=active`,
-       errorCallback: handleError
+        key: `product/list?status=active`,
+        errorCallback: handleError,
+        lifetime: '30m'
     }
     ```
-2. `preSync`: `CachifyJS` will make the api call, cache the response and return the response. 
-    The `cacheConfig` should look like,
+2. `preSync`: `CachifyJS` will make the api call, cache the response and return the response.
+   The `cacheConfig` should look like,
     ```
     const cacheConfig = {
        key: `product/list?status=active`,
@@ -170,27 +180,27 @@ function handleError (error) {
     }
     ```
 3. `postSync`: `CachifyJS` will try to get data from cache. If data not found, an immediate api call will be made. Otherwise,
-it will make the api call and return the response according to the `syncTimeout` or `syncInterval` value. Data will be cached 
-in both scenario.
+   it will make the api call and return the response according to the `syncTimeout` or `syncInterval` value. Data will be cached
+   in both scenario.
     ```
     const cacheConfig = {
-       key: `product/list?status=active`,
-       errorCallback: handleError,
-        lifetime: 1000 * 60 * 60, //time in milliseconds
-       postSync: {
+        key: `product/list?status=active`,
+        errorCallback: handleError,
+        lifetime: '1h',
+        postSync: {
            callback: handleResponse,
-           syncTimeout: 1, //time in milliseconds
-           syncInterval: 1000 * 60 * 60 * 3, //time in milliseconds
-       },
+           syncTimeout: 1,//default (ms)
+           syncInterval: '3h',
+        },
     }
     ```
-   Different configurations:
-   1. `syncTimeout`: The time delay after that api call will be made. It's a one time call.
-   2. `syncInterval`: The time interval for the api call. It's a repetitive process. It works in background.
+   Notes:
+    1. `syncTimeout`: The time delay after that api call will be made. It's a one time call.
+    2. `syncInterval`: The time interval for the api call. It's a repetitive process. It works in background.
 
 
 ## Conclusion
-CachifyJS is a simple yet powerful tool that can help you optimize your frontend application's performance 
+CachifyJS is a simple yet powerful tool that can help you optimize your frontend application's performance
 by reducing the number of API requests. By caching API responses in the browser's local storage,
 you can improve your application's response time and make it more responsive to user interactions.
 Give it a try in your next project!
