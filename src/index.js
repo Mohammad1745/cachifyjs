@@ -9,10 +9,10 @@ class CachifyJS {
     key;
     response;
 
-    constructor() {
+    constructor () {
         this.axiosConfig = null;
         this.errorCallback = null;
-        this.lifetime = 1000 * 60 * 60 * 24 * 2;
+        this.lifetime = '2d';
         this.preSync = null;
         this.postSync = null;
         this.key = null;
@@ -26,7 +26,6 @@ class CachifyJS {
 
         this.setup(axiosConfig, cacheConfig);
         this.removeExpiredData()
-        this.updateExpiration()
 
         if (this.preSync) {
             await this.refreshData();
@@ -39,8 +38,8 @@ class CachifyJS {
             } else if (this.postSync && this.postSync.syncTimeout) {
                 const id = setTimeout(async () => {
                     await this.refreshData();
-                    this.postSync.callback(this.getData(this.key));
-                }, this.postSync.syncTimeout);
+                    this.postSync.callback( this.getData(this.key));
+                }, this.toMs( this.postSync.syncTimeout));
 
                 this.updateTimeout(id);
             }
@@ -48,8 +47,8 @@ class CachifyJS {
             if (this.postSync && this.postSync.syncInterval) {
                 const id = setInterval(async () => {
                     await this.refreshData();
-                    this.postSync.callback(this.getData(this.key));
-                }, this.postSync.syncInterval);
+                    this.postSync.callback( this.getData(this.key));
+                }, this.toMs( this.postSync.syncInterval));
 
                 this.updateInterval(id);
             }
@@ -57,7 +56,7 @@ class CachifyJS {
         return this.response;
     }
 
-    setup(axiosConfig, cacheConfig) {
+    setup (axiosConfig, cacheConfig) {
         this.axiosConfig = axiosConfig;
         this.errorCallback = cacheConfig.errorCallback;
         this.lifetime = cacheConfig.lifetime ?? this.lifetime;
@@ -67,10 +66,11 @@ class CachifyJS {
         this.response = {};
     }
 
-    async refreshData() {
+    async refreshData () {
         try {
             let response = await axios(this.axiosConfig);
             if (response.data) {
+                this.updateExpiration()
                 this.setData(this.key, response.data);
             } else {
                 throw new Error(response.response);
@@ -85,31 +85,9 @@ class CachifyJS {
         }
     }
 
-    updateInterval(id) {
-        let intervals = this.getIntervals();
-        const filtered = intervals.filter((item) => item.key == this.key);
-        if (filtered.length) {
-            filtered.forEach((item) => clearInterval(item.interval));
-            intervals = intervals.filter((item) => item.key != this.key);
-        }
-        intervals.push({ key: this.key, id });
-        this.setIntervals(intervals);
-    }
-
-    updateTimeout(id) {
-        let timeouts = this.getTimeouts();
-        const filtered = timeouts.filter((item) => item.key == this.key);
-        if (filtered.length) {
-            filtered.forEach((item) => clearTimeout(item.timeout));
-            timeouts = timeouts.filter((item) => item.key != this.key);
-        }
-        timeouts.push({ key: this.key, id });
-        this.setTimeouts(timeouts);
-    }
-
-    updateExpiration() {
+    updateExpiration () {
         const currentTime = (new Date()).getTime()
-        const expiration = currentTime + Number(this.lifetime)
+        const expiration = currentTime + this.toMs(this.lifetime)
 
         let expirations = this.getExpirations();
         expirations = expirations.filter((item) => item.key != this.key);
@@ -132,37 +110,59 @@ class CachifyJS {
         }
     }
 
-    setIntervals(intervals) {
+    updateInterval (id) {
+        let intervals = this.getIntervals();
+        const filtered = intervals.filter((item) => item.key == this.key);
+        if (filtered.length) {
+            filtered.forEach((item) => clearInterval(item.interval));
+            intervals = intervals.filter((item) => item.key != this.key);
+        }
+        intervals.push({ key: this.key, id });
+        this.setIntervals(intervals);
+    }
+
+    updateTimeout (id) {
+        let timeouts = this.getTimeouts();
+        const filtered = timeouts.filter((item) => item.key == this.key);
+        if (filtered.length) {
+            filtered.forEach((item) => clearTimeout(item.timeout));
+            timeouts = timeouts.filter((item) => item.key != this.key);
+        }
+        timeouts.push({ key: this.key, id });
+        this.setTimeouts(timeouts);
+    }
+
+    setIntervals (intervals) {
         localStorage.setItem("intervals", JSON.stringify(intervals));
     }
 
-    getIntervals() {
+    getIntervals () {
         let data = localStorage.getItem("intervals");
         if (data) return JSON.parse(data);
         return [];
     }
 
-    setTimeouts(timeouts) {
+    setTimeouts (timeouts) {
         localStorage.setItem("timeouts", JSON.stringify(timeouts));
     }
 
-    getTimeouts() {
+    getTimeouts () {
         let data = localStorage.getItem("timeouts");
         if (data) return JSON.parse(data);
         return [];
     }
 
-    setExpirations(expirations) {
+    setExpirations (expirations) {
         localStorage.setItem("expirations", JSON.stringify(expirations));
     }
 
-    getExpirations() {
+    getExpirations () {
         let data = localStorage.getItem("expirations");
         if (data) return JSON.parse(data);
         return [];
     }
 
-    setData(key, data){
+    setData (key, data) {
         localStorage.setItem(key, JSON.stringify(data));
     }
     getData (key)  {
@@ -175,8 +175,37 @@ class CachifyJS {
             return {message: "Data not found",nodata:true};
         }
     }
-    removeData(key){
+    removeData (key) {
         localStorage.removeItem(key);
+    }
+
+    toMs(timeString) {
+        if (typeof timeString === 'number') return timeString
+        if (timeString.length > 2 && timeString.slice(-2) === 'ms') {
+            timeString = timeString.slice(0, -2)
+        }
+
+        const timeSpecifiers = ['s', 'm', 'h', 'd', 'w']
+        const timeMultipliers = [1000, 60, 60, 24, 7]
+        const specifier = timeString.slice(-1);
+        let time = 1;
+
+        if (timeSpecifiers.includes(specifier)) {
+            time = Number(timeString.slice(0, -1));
+            if (isNaN(time)) throw new Error('Invalid time 1')
+            for (let i = 0; i < timeSpecifiers.length; i++) {
+                time *= timeMultipliers[i];
+                if (specifier === timeSpecifiers[i]) {
+                    break
+                }
+            }
+        }
+        else {
+            time = Number(timeString)
+        }
+
+        if (isNaN(time)) throw new Error('Invalid time 2')
+        return time
     }
 };
 export default CachifyJS;
