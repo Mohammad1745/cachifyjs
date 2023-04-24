@@ -22,7 +22,7 @@ npm install cachifyjs
 To use CachifyJS, you need to import it into your JavaScript file and pass your API call to the `cachifyjs` function.
 The `cachifyjs` function will first check if the API response is already cached in local storage. If it is, it will
 return the cached data, make the api call, cache the response and run the callback. If not, it will make
-the API call, cache the response in local storage, and return the data.
+the API call, cache the response in local storage and return the data.
 
 Here's an example:
 ```
@@ -31,12 +31,14 @@ import cachifyjs from "cachifyjs";
 function getProductList () {
     
     try {    
+        // configuration for api call
         const axiosConfig = {
             method: "GET",
             headers: { Authorization: `Bearer ${token}` },
             url: `https://www.yoursite.com/api/product/list?status=active`
         }
     
+        // configuration for caching
         const cacheConfig = {
             key: `product/list?status=active`,//your own choice, recommended to keep it similar to your api uri
             errorCallback: handleError,
@@ -53,7 +55,7 @@ function getProductList () {
         
         handleResponse (response)
     } catch (error) {
-        //handle error
+        handleError (error)
     }
 }
 
@@ -65,6 +67,9 @@ function handleError (error) {
     //handle if any error occurs during data refreshing on api call (ex: authentication error)
 }
 ```
+Notes:
+1. `handleResponse`: The function has been used as `callback` in `postSync` and also been used to handle the `response` of api call.
+2. `handleError`: The function has been used as `errorCallback` in `cacheConfig` and also been used to handle the `error` on api call.
 
 ## Configuration
 When using CachifyJS, you can configure various options to customize the caching behavior. The `cacheConfig` object passed to the `get` function accepts the following properties:
