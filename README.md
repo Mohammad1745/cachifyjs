@@ -116,7 +116,7 @@ When using CachifyJS, you can configure various options to customize the caching
 3. `postSync`: `CachifyJS` will try to get data from cache. If data not found, an immediate api call will be made. Otherwise, if  `syncTimeout` is present in 
     the config a single api call will be made according to the value.
 
-   If `syncInterval` is present in the config, `cachifyjs` will check make the api call and return the response according to the `syncInterval` value.
+   If `syncInterval` is present in the config, `cachifyjs` will make api call according to the `syncInterval` value and return the response.
    
    Data will be cached in both scenarios.
     ```
