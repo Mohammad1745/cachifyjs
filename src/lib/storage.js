@@ -17,7 +17,6 @@ export function getData (key, encryptionSecretKey=null)  {
         data =  JSON.parse(data);
         return data
     } catch (e) {
-        console.error(e.message)
         removeData(key);
         return {message: "Data not found",nodata:true};
     }
