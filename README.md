@@ -95,7 +95,7 @@ When using CachifyJS, you can configure various options to customize the caching
 ## Scenarios
 
 1. `Plain`: `CachifyJS` will try to get data from cache. If data found, no api call will be made. Otherwise,
-   it will make the api call and return the response. It's recommended to use `lifetime` for this case. After the cache being expired, New api call will be made to get fresh data.
+   it will make the api call and return the response. It's recommended to use `lifetime` for this case. After the cache being expired, new api call will be made to get fresh data.
     The `cacheConfig` should look like,
     ```
     const cacheConfig = {
