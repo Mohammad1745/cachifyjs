@@ -1,4 +1,4 @@
-import CachifyJS from "./lib/main";
+import CachifyJS from "./lib/main.js";
 
 export default async function cachify (axiosConfig, cacheConfig) {
     let cachifyjs = new CachifyJS()

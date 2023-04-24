@@ -1,6 +1,6 @@
 import axios from "axios";
-import toMs from "./ts";
-import {getData, setData, removeData} from "./storage";
+import toMs from "./ts.js";
+import {getData, setData, removeData} from "./storage.js";
 
 class CachifyJS {
     axiosConfig;
