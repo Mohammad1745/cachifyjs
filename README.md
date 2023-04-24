@@ -72,7 +72,7 @@ Notes:
 2. `handleError`: The function has been used as `errorCallback` in `cacheConfig` and also been used to handle the `error` on api call.
 
 ## Configuration
-When using CachifyJS, you can configure various options to customize the caching behavior. The `cacheConfig` object passed to the `get` function accepts the following properties:
+When using CachifyJS, you can configure various options to customize the caching behavior. The `cacheConfig` object passed to the `cachifyjs` function accepts the following properties:
 
 - `key`: (required) A string that uniquely identifies the API endpoint being called. This key is used as the key for caching the response in local storage. 
     It's recommended to keep it similar to your api uri.
