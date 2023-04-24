@@ -2,7 +2,7 @@
 
 CachifyJS is a lightweight framework-agnostic npm package that helps you cache API responses in the browser's local storage.
 By caching API responses, you can reduce the number of network requests and improve the
-performance of your frontend application.
+performance of your frontend application built on any technology like: react, vue, angular, you name it.
 
 ## Installation
 
