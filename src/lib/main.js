@@ -18,6 +18,7 @@ class CachifyJS {
         this.preSync = null;
         this.postSync = null;
         this.key = null;
+        this.encryption = null;
         this.response = {};
     }
 
@@ -36,16 +37,16 @@ class CachifyJS {
 
         if (this.preSync) {
             await this.refreshData();
-            this.response.data = getData(this.key);
+            this.response.data = getData(this.key, this.encryption?.secretKey);
         } else {
-            this.response.data = getData(this.key);
+            this.response.data = getData(this.key, this.encryption?.secretKey);
             if (this.response.data.nodata) {
                 await this.refreshData();
-                this.response.data = getData(this.key);
+                this.response.data = getData(this.key, this.encryption?.secretKey);
             } else if (this.postSync && this.postSync.syncTimeout) {
                 const id = setTimeout(async () => {
                     await this.refreshData();
-                    this.postSync.callback( getData(this.key));
+                    this.postSync.callback( getData(this.key, this.encryption?.secretKey));
                 }, toMs( this.postSync.syncTimeout));
 
                 this.updateTimeout(id);
@@ -54,7 +55,7 @@ class CachifyJS {
             if (this.postSync && this.postSync.syncInterval) {
                 const id = setInterval(async () => {
                     await this.refreshData();
-                    this.postSync.callback( getData(this.key));
+                    this.postSync.callback( getData(this.key, this.encryption?.secretKey));
                 }, toMs( this.postSync.syncInterval));
 
                 this.updateInterval(id);
@@ -70,6 +71,7 @@ class CachifyJS {
         this.preSync = cacheConfig.preSync;
         this.postSync = cacheConfig.postSync;
         this.key = cacheConfig.key;
+        this.encryption = cacheConfig.encryption ?? this.encryption;
         this.response = {};
     }
 
@@ -78,7 +80,7 @@ class CachifyJS {
             let response = await axios(this.axiosConfig);
             if (response.data) {
                 this.updateExpiration()
-                setData(this.key, response.data);
+                setData(this.key, response.data, this.encryption?.secretKey);
             } else {
                 throw new Error(response.response);
             }

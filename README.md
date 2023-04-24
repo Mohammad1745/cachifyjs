@@ -10,23 +10,29 @@ performance of your frontend application built on any technology like: react, vu
 npm install cachifyjs
 ```
 
-## What's new! (v2.0)
+## What's new! (v2)
 
-- Default function `cachifyjs(axiosConfig, cacheConfig)`
+- `encryption`
+
+  CachifyJS now supports data encryption to help keep your cached data secure. To use encryption, you'll need to provide
+    a secret key to the cache configuration. This secret key will be used to encrypt and decrypt your data.
+
+
+- Default function `cachify(axiosConfig, cacheConfig)`
 
     Pain reduction! The previous requirement of creating object from class is now history for us. Simply import the function,
     call it and boom, you get the data.
 
 
 ## Guides
-To use CachifyJS, you need to import it into your JavaScript file and pass your API call to the `cachifyjs` function.
-The `cachifyjs` function will first check if the API response is already cached in local storage. If it is, it will
+To use CachifyJS, you need to import it into your JavaScript file and pass your API call to the `cachify` function.
+The `cachify` function will first check if the API response is already cached in local storage. If it is, it will
 return the cached data, make the api call, cache the response and run the callback. If not, it will make
 the API call, cache the response in local storage and return the data.
 
 Here's an example:
 ```
-import cachifyjs from "cachifyjs";
+import cachify from "cachifyjs";
 
 function getProductList () {
     
@@ -43,6 +49,9 @@ function getProductList () {
             key: `product/list?status=active`,//your own choice, recommended to keep it similar to your api uri
             errorCallback: handleError,
             lifetime: '1h',
+            encryption: {
+                secretKey: 'my-secret-key'
+            },
             postSync: {
                 callback: handleResponse,
                 syncTimeout: 1, //default (ms)
@@ -51,7 +60,7 @@ function getProductList () {
         }
         
         //GET request only
-        let response = await cachifyjs(axiosConfig, cacheConfig)
+        let response = await cachify(axiosConfig, cacheConfig)
         
         handleResponse (response)
     } catch (error) {
@@ -72,7 +81,7 @@ Notes:
 2. `handleError`: The function has been used as `errorCallback` in `cacheConfig` and also been used to handle the `error` on api call.
 
 ## Configuration
-When using CachifyJS, you can configure various options to customize the caching behavior. The `cacheConfig` object passed to the `cachifyjs` function accepts the following properties:
+When using CachifyJS, you can configure various options to customize the caching behavior. The `cacheConfig` object passed to the `cachify` function accepts the following properties:
 
 - `key`: (required) A string that uniquely identifies the API endpoint being called. This key is used as the key for caching the response in local storage. 
     It's recommended to keep it similar to your api uri.
@@ -80,6 +89,12 @@ When using CachifyJS, you can configure various options to customize the caching
 - `errorCallback`: (required) A callback function that will be called if an error occurs during the API call. This can be used to handle errors such as authentication failures.
 
 - `lifetime` (optional): The amount of time in milliseconds that the cached response should be considered valid. After this time has elapsed, the cache will be invalidated.
+
+- `encryption` (optional): For sensitive data, encryption can be enabled. **Caution: Note that enabling encryption can increase the CPU power required to read and write cached data.
+     Be mindful of this when using cachifyjs with encryption enabled, especially in resource-constrained environments.**
+
+  - `secretKey` (required): To use encryption, you'll need to provide a secret key to the encryption configuration. This secret key will be 
+       used to encrypt and decrypt your data.
 
 - `preSync`: (optional) A boolean that simply enables caching after getting api response and then sending data to frontend.
 
@@ -101,7 +116,10 @@ When using CachifyJS, you can configure various options to customize the caching
     const cacheConfig = {
         key: `product/list?status=active`,
         errorCallback: handleError,
-        lifetime: '30m'
+        lifetime: '30m',
+        encryption: {
+            secretKey: 'my-secret-key'
+        }
     }
     ```
 2. `preSync`: `CachifyJS` will make the api call, cache the response and return the response.
