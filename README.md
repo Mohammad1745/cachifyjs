@@ -21,7 +21,7 @@ npm install cachifyjs
 ## Guides
 To use CachifyJS, you need to import it into your JavaScript file and pass your API call to the `cachifyjs` function.
 The `cachifyjs` function will first check if the API response is already cached in local storage. If it is, it will
-return the cached data and make the api call, cache the response and run the callback. If not, it will make
+return the cached data, make the api call, cache the response and run the callback. If not, it will make
 the API call, cache the response in local storage, and return the data.
 
 Here's an example:
