@@ -90,8 +90,7 @@ When using CachifyJS, you can configure various options to customize the caching
 
 - `lifetime` (optional): The amount of time in milliseconds that the cached response should be considered valid. After this time has elapsed, the cache will be invalidated.
 
-- `encryption` (optional): For sensitive data, encryption can be enabled. **Caution: Note that enabling encryption can increase the CPU power required to read and write cached data.
-     Be mindful of this when using cachifyjs with encryption enabled, especially in resource-constrained environments.**
+- `encryption` (optional): For sensitive data, encryption can be enabled.
 
   - `secretKey` (required): To use encryption, you'll need to provide a secret key to the encryption configuration. This secret key will be 
        used to encrypt and decrypt your data.
@@ -153,6 +152,9 @@ When using CachifyJS, you can configure various options to customize the caching
     1. `syncTimeout`: The time delay after that api call will be made. It's a one time call.
     2. `syncInterval`: The time interval for the api call. It's a repetitive process. It works in background.
 
+
+## Dependencies
+[Axios](https://www.npmjs.com/package/axios), [Crypto-JS](https://www.npmjs.com/package/crypto-js)
 
 ## Conclusion
 CachifyJS is a simple yet powerful tool that can help you optimize your frontend application's performance
