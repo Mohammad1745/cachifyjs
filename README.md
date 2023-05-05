@@ -25,8 +25,6 @@ npm install cachifyjs
 - [Conclusion & Feedback](#conclusion)
 
 
-<a href="#table_of_contents" class="glowing-text">Table of Contents</a>
-
 ## What's new! (v2.2) <p id="whats_new"></p>
 
 - `updateCache` function
@@ -268,29 +266,3 @@ Give it a try in your next project!
 
 
 <a target="_blank" href="https://mail.google.com/mail/?view=cm&fs=1&tf=1&to=mdali2016.227@gmail.com&su=Feedback about cachifyjs">Give Us Your Feedback</a>
-
-
-
-<style>
-.glowing-text {
-  position: fixed;
-  bottom: 10px;
-  right: 10px;
-  color: #007bff; 
-  text-shadow: 0 0 5px #007bff, 0 0 10px #007bff, 0 0 15px #007bff, 0 0 20px #007bff, 0 0 25px #007bff, 0 0 30px #007bff, 0 0 35px #007bff;
-  animation: glowing 2s ease-in-out infinite;
-}
-
-@keyframes glowing {
-  0% {
-    text-shadow: 0 0 5px #007bff, 0 0 10px #007bff, 0 0 15px #007bff;
-  }
-  50% {
-    text-shadow: none;
-  }
-  100% {
-    text-shadow: 0 0 5px #007bff, 0 0 10px #007bff, 0 0 15px #007bff;
-  }
-}
-
-</style>
