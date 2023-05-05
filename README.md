@@ -4,14 +4,13 @@ CachifyJS is a lightweight framework-agnostic npm package that helps you cache A
 By caching API responses, you can reduce the number of network requests and improve the
 performance of your frontend application built on any technology like: react, vue, angular, you name it.
 
-## Installation
-<p id="installation"></p>
+## Installation <p id="installation"></p>
 
 ```
 npm install cachifyjs
 ```
 
-## Table of Contents
+## Table of Contents <p id="table_of_contents"></p>
 - [What's new! (v2.2)](#whats_new)
 - [Guides](#guides)
     - [Caching API Response](#caching_api_responses)
@@ -23,30 +22,29 @@ npm install cachifyjs
         - [Configuration](#update_cached_data_configuration)
     - [Remove Cached Data](#remove_cached_data)
 - [Dependencies](#dependencies)
-- [Conclusion](#conclusion)
+- [Conclusion & Feedback](#conclusion)
 
 
-## What's new! (v2.2)
-<p id="whats_new"></p>
+<a href="#table_of_contents" class="glowing-text">Table of Contents</a>
 
-- `updateCache(config, data)` function
+## What's new! (v2.2) <p id="whats_new"></p>
+
+- `updateCache` function
 
   The `updateCache` function is one of the latest additions to the CachifyJS package, and it allows you to update the cached data in your
   frontend application. With this new feature, you can easily modify the existing data in the cache without making a new network request to the API.
 
 
-- `removeCache(config)` function
+- `removeCache` function
 
   The `removeCache` function is one of the latest additions to the CachifyJS package, and it allows you to remove the cached data from your
   frontend application without waiting for the data expiration.
 
 
 
-## Guides
-<p id="guides"></p>
+## Guides <p id="guides"></p>
 
-### 1. Caching API Response:
-<p id="caching_api_responses"></p>
+### 1. Caching API Response: <p id="caching_api_responses"></p>
 
 To use CachifyJS, import the `cachify` function into your JavaScript file and pass your API call to it.
 The `cachify` function will first check if the API response is already cached in local storage. If it is, it will
@@ -99,14 +97,12 @@ function handleError (error) {
     //handle if any error occurs during data refreshing on api call (ex: authentication error)
 }
 ```
-#### Notes
-<p id="caching_api_responses_notes"></p>
+#### Notes <p id="caching_api_responses_notes"></p>
 
 - `handleResponse`: The function has been used as `callback` in `postSync` and also been used to handle the `response` of api call.
 - `handleError`: The function has been used as `errorCallback` in `cacheConfig` and also been used to handle the `error` on api call.
 
-#### Configuration
-<p id="caching_api_responses_configuration"></p>
+#### Configuration <p id="caching_api_responses_configuration"></p>
 
 When using CachifyJS, you can configure various options to customize the caching behavior. The `cacheConfig` object passed to the `cachify` function accepts the following properties:
 
@@ -133,8 +129,7 @@ When using CachifyJS, you can configure various options to customize the caching
 
     - `syncInterval`: (optional) The number of milliseconds to wait before syncing the cache again. This is useful if you want to periodically update the cache with new data.
 
-#### Scenarios
-<p id="caching_api_responses_scenarios"></p>
+#### Scenarios <p id="caching_api_responses_scenarios"></p>
 
 1. `Plain`: `CachifyJS` will try to get data from cache. If data found, no api call will be made. Otherwise,
    it will make the api call and return the response. It's recommended to use `lifetime` for this case. After the cache being expired, new api call will be made to get fresh data.
@@ -181,8 +176,7 @@ When using CachifyJS, you can configure various options to customize the caching
     2. `syncInterval`: The time interval for the api call. It's a repetitive process. It works in background.
 
 
-### 2. Update Cached Data:
-<p id="update_cached_data"></p>
+### 2. Update Cached Data: <p id="update_cached_data"></p>
 
 To update cached data, import the `updateCache` function into your JavaScript file and pass a `config` and `data` to the 
 function. The function will  update the cached data in frontend without making api call.
@@ -216,13 +210,11 @@ function handleResponse (response) {
     //handle api response here
 }
 ```
-#### Notes
-<p id="update_cached_data_notes"></p>
+#### Notes <p id="update_cached_data_notes"></p>
 
-- `handleResponse`: The function has been used as `callback` in `postSync` previously. This callback will be called after the data has been updated.
+- `handleResponse`: The function has been used to handle the api response previously. This callback will be called after the data has been updated.
 
-#### Configuration
-<p id="update_cached_data_configuration"></p>
+#### Configuration <p id="update_cached_data_configuration"></p>
 
 When updating data, the `config` object passed to the `updateCache` function accepts the following properties:
 
@@ -241,8 +233,7 @@ When updating data, the `config` object passed to the `updateCache` function acc
        cacheConfig during initial caching.
 
 
-### 3. Remove Cached Data:
-<p id="remove_cached_data"></p>
+### 3. Remove Cached Data: <p id="remove_cached_data"></p>
 
 To remove cached data, import the `removeCache` function into your JavaScript file and pass a `config` with the `key` property to the function.
 The function will remove the cached data.
@@ -264,13 +255,11 @@ function removeProductListCache () {
 }
 ```
 
-## Dependencies
-<p id="dependencies"></p>
+## Dependencies <p id="dependencies"></p>
 
 [Axios](https://www.npmjs.com/package/axios), [Crypto-JS](https://www.npmjs.com/package/crypto-js)
 
-## Conclusion
-<p id="conclusion"></p>
+## Conclusion <p id="conclusion"></p>
 
 CachifyJS is a simple yet powerful tool that can help you optimize your frontend application's performance
 by reducing the number of API requests. By caching API responses in the browser's local storage,
@@ -279,3 +268,29 @@ Give it a try in your next project!
 
 
 <a target="_blank" href="https://mail.google.com/mail/?view=cm&fs=1&tf=1&to=mdali2016.227@gmail.com&su=Feedback about cachifyjs">Give Us Your Feedback</a>
+
+
+
+<style>
+.glowing-text {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  color: #007bff; 
+  text-shadow: 0 0 5px #007bff, 0 0 10px #007bff, 0 0 15px #007bff, 0 0 20px #007bff, 0 0 25px #007bff, 0 0 30px #007bff, 0 0 35px #007bff;
+  animation: glowing 2s ease-in-out infinite;
+}
+
+@keyframes glowing {
+  0% {
+    text-shadow: 0 0 5px #007bff, 0 0 10px #007bff, 0 0 15px #007bff;
+  }
+  50% {
+    text-shadow: none;
+  }
+  100% {
+    text-shadow: 0 0 5px #007bff, 0 0 10px #007bff, 0 0 15px #007bff;
+  }
+}
+
+</style>
