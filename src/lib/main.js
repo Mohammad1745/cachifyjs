@@ -2,12 +2,13 @@ import axios from "axios";
 import toMs from "./ts.js";
 import {getData, setData, removeData} from "./storage.js";
 
-class CachifyJS {
+class CachifyCore {
     axiosConfig;
     errorCallback;
     lifetime;
     preSync;
     postSync;
+    afterUpdate;
     key;
     response;
 
@@ -17,6 +18,7 @@ class CachifyJS {
         this.lifetime = '2d';
         this.preSync = null;
         this.postSync = null;
+        this.afterUpdate = null;
         this.key = null;
         this.encryption = null;
         this.response = {};
@@ -64,12 +66,31 @@ class CachifyJS {
         return this.response;
     }
 
+    async update (config, data) {
+        this.setup(null, config);
+        this.removeExpiredData()
+        this.updateExpiration()
+        setData(this.key, data, this.encryption?.secretKey);
+        if (this.afterUpdate) {
+            if (this.afterUpdate.callback) {
+                this.afterUpdate.callback( getData(this.key, this.encryption?.secretKey));
+            }
+        }
+    }
+
+    async remove (config) {
+        this.setup(null, config);
+        this.removeExpiredData()
+        removeData(this.key);
+    }
+
     setup (axiosConfig, cacheConfig) {
         this.axiosConfig = axiosConfig;
         this.errorCallback = cacheConfig.errorCallback;
         this.lifetime = cacheConfig.lifetime ?? this.lifetime;
         this.preSync = cacheConfig.preSync;
         this.postSync = cacheConfig.postSync;
+        this.afterUpdate = cacheConfig.afterUpdate;
         this.key = cacheConfig.key;
         this.encryption = cacheConfig.encryption ?? this.encryption;
         this.response = {};
@@ -145,4 +166,4 @@ class CachifyJS {
         setData('timeouts', timeouts);
     }
 };
-export default CachifyJS;
+export default CachifyCore;

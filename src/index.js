@@ -1,6 +1,14 @@
-import CachifyJS from "./lib/main.js";
+import CachifyCore from "./lib/main.js";
 
-export default async function cachify (axiosConfig, cacheConfig) {
-    let cachifyjs = new CachifyJS()
-    return await cachifyjs.get(axiosConfig, cacheConfig)
-};
+export const cachify = async (axiosConfig, cacheConfig) => {
+    let cachifyCore = new CachifyCore()
+    return await cachifyCore.get(axiosConfig, cacheConfig)
+}
+export const updateCache = async (config, data) => {
+    let cachifyCore = new CachifyCore()
+    return await cachifyCore.update(config, data)
+}
+export const removeCache = async (config) => {
+    let cachifyCore = new CachifyCore()
+    return await cachifyCore.remove(config)
+}
