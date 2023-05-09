@@ -1,9 +1,10 @@
 {
   "name": "cachifyjs",
-  "version": "2.2.2-beta",
+  "version": "2.2.2",
   "type": "module",
   "description": "CachifyJS is a  js package to cache api responses and call them automagically and repeatedly. That can be controlled by parameters.",
   "main": "src/index.js",
+  "types": "src/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

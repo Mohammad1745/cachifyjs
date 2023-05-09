@@ -4,13 +4,17 @@ CachifyJS is a lightweight framework-agnostic npm package that helps you cache A
 By caching API responses, you can reduce the number of network requests and improve the
 performance of your frontend application built on any technology like: react, vue, angular, you name it.
 
-## Installation <p id="installation"></p>
+<p id="installation"></p>
+
+## Installation 
 
 ```
 npm install cachifyjs
 ```
 
-## Table of Contents <p id="table_of_contents"></p>
+<p id="table_of_contents"></p>
+
+## Table of Contents 
 - [What's new! (v2.2)](#whats_new)
 - [Guides](#guides)
     - [Caching API Response](#caching_api_responses)
@@ -25,7 +29,14 @@ npm install cachifyjs
 - [Conclusion & Feedback](#conclusion)
 
 
-## What's new! (v2.2) <p id="whats_new"></p>
+<p id="whats_new"></p>
+
+## What's new! (v2.2) 
+
+- `TypeScript` Support
+
+  Starting from version 2.2.2, `CachifJS` now includes TypeScript support. With this update, you can use this package in any TypeScript project.
+
 
 - `updateCache` function
 
@@ -40,9 +51,13 @@ npm install cachifyjs
 
 
 
-## Guides <p id="guides"></p>
+<p id="guides"></p>
 
-### 1. Caching API Response: <p id="caching_api_responses"></p>
+## Guides 
+
+<p id="caching_api_responses"></p>
+
+### 1. Caching API Response: 
 
 To use CachifyJS, import the `cachify` function into your JavaScript file and pass your API call to it.
 The `cachify` function will first check if the API response is already cached in local storage. If it is, it will
@@ -95,12 +110,16 @@ function handleError (error) {
     //handle if any error occurs during data refreshing on api call (ex: authentication error)
 }
 ```
-#### Notes <p id="caching_api_responses_notes"></p>
+<p id="caching_api_responses_notes"></p>
+
+#### Notes 
 
 - `handleResponse`: The function has been used as `callback` in `postSync` and also been used to handle the `response` of api call.
 - `handleError`: The function has been used as `errorCallback` in `cacheConfig` and also been used to handle the `error` on api call.
 
-#### Configuration <p id="caching_api_responses_configuration"></p>
+<p id="caching_api_responses_configuration"></p>
+
+#### Configuration 
 
 When using CachifyJS, you can configure various options to customize the caching behavior. The `cacheConfig` object passed to the `cachify` function accepts the following properties:
 
@@ -127,7 +146,9 @@ When using CachifyJS, you can configure various options to customize the caching
 
     - `syncInterval`: (optional) The number of milliseconds to wait before syncing the cache again. This is useful if you want to periodically update the cache with new data.
 
-#### Scenarios <p id="caching_api_responses_scenarios"></p>
+<p id="caching_api_responses_scenarios"></p>
+
+#### Scenarios 
 
 1. `Plain`: `CachifyJS` will try to get data from cache. If data found, no api call will be made. Otherwise,
    it will make the api call and return the response. It's recommended to use `lifetime` for this case. After the cache being expired, new api call will be made to get fresh data.
@@ -174,7 +195,9 @@ When using CachifyJS, you can configure various options to customize the caching
     2. `syncInterval`: The time interval for the api call. It's a repetitive process. It works in background.
 
 
-### 2. Update Cached Data: <p id="update_cached_data"></p>
+<p id="update_cached_data"></p>
+
+### 2. Update Cached Data: 
 
 To update cached data, import the `updateCache` function into your JavaScript file and pass a `config` and `data` to the 
 function. The function will  update the cached data in frontend without making api call.
@@ -208,11 +231,15 @@ function handleResponse (response) {
     //handle api response here
 }
 ```
-#### Notes <p id="update_cached_data_notes"></p>
+<p id="update_cached_data_notes"></p>
+
+#### Notes 
 
 - `handleResponse`: The function has been used to handle the api response previously. This callback will be called after the data has been updated.
 
-#### Configuration <p id="update_cached_data_configuration"></p>
+<p id="update_cached_data_configuration"></p>
+
+#### Configuration 
 
 When updating data, the `config` object passed to the `updateCache` function accepts the following properties:
 
@@ -231,7 +258,9 @@ When updating data, the `config` object passed to the `updateCache` function acc
        cacheConfig during initial caching.
 
 
-### 3. Remove Cached Data: <p id="remove_cached_data"></p>
+<p id="remove_cached_data"></p>
+
+### 3. Remove Cached Data: 
 
 To remove cached data, import the `removeCache` function into your JavaScript file and pass a `config` with the `key` property to the function.
 The function will remove the cached data.
@@ -253,11 +282,15 @@ function removeProductListCache () {
 }
 ```
 
-## Dependencies <p id="dependencies"></p>
+<p id="dependencies"></p>
+
+## Dependencies 
 
 [Axios](https://www.npmjs.com/package/axios), [Crypto-JS](https://www.npmjs.com/package/crypto-js)
 
-## Conclusion <p id="conclusion"></p>
+<p id="conclusion"></p>
+
+## Conclusion 
 
 CachifyJS is a simple yet powerful tool that can help you optimize your frontend application's performance
 by reducing the number of API requests. By caching API responses in the browser's local storage,
