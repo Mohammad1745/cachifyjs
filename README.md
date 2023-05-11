@@ -86,7 +86,7 @@ function getProductList () {
             secretKey: 'my-secret-key'
         },
         postSync: {
-            callback: handleResponse,
+            callback: handleResponseData,
             syncTimeout: 1, //default (ms)
             syncInterval: '3h', //with time specifier
         },
@@ -104,6 +104,16 @@ function getProductList () {
 
 function handleResponse (response) {
     //handle api response here
+    if (response.data) {
+        handleResponseData (response.data)
+    }
+    else {
+        console.log(response)
+    }
+}
+
+function handleResponseData (data) {
+    //handle api response data here
 }
 
 function handleError (error) {
@@ -184,7 +194,7 @@ When using CachifyJS, you can configure various options to customize the caching
         errorCallback: handleError,
         lifetime: '1h',
         postSync: {
-           callback: handleResponse,
+           callback: handleResponseData,
            syncTimeout: 1,//default (ms)
            syncInterval: '3h',
         },
@@ -215,7 +225,7 @@ function updateProductListCache (updatedData) {
             secretKey: 'my-secret-key'//it must be the same as the key used to cache the data
         },
         afterUpdate: {
-           callback: handleResponse, //the same callback previously use in cacheConfig
+           callback: handleResponseData, //the same callback previously use in cacheConfig
         }
     }
         
