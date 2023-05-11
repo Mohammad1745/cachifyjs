@@ -1,6 +1,6 @@
 # CachifyJS
 
-CachifyJS is a lightweight framework-agnostic npm package that helps you cache API responses in the browser's local storage.
+CachifyJS is a lightweight framework-agnostic npm package that helps you cache API responses data in the browser's local storage.
 By caching API responses, you can reduce the number of network requests and improve the
 performance of your frontend application built on any technology like: react, vue, angular, you name it.
 
@@ -61,8 +61,8 @@ npm install cachifyjs
 
 To use CachifyJS, import the `cachify` function into your JavaScript file and pass your API call to it.
 The `cachify` function will first check if the API response is already cached in local storage. If it is, it will
-return the cached data, make the api call, cache the response and run the callback. If not, it will make
-the API call, cache the response in local storage and return the data.
+return the cached data, make the api call, cache the response data and run the callback. If not, it will make
+the API call, cache the response data in local storage and return the data.
 
 Here's an example:
 ```
@@ -124,7 +124,7 @@ function handleError (error) {
 
 #### Notes 
 
-- `handleResponse`: The function has been used as `callback` in `postSync` and also been used to handle the `response` of api call.
+- `handleResponseData`: The function has been used as `callback` in `postSync` and also been used to handle the response `data` of api call.
 - `handleError`: The function has been used as `errorCallback` in `cacheConfig` and also been used to handle the `error` on api call.
 
 <p id="caching_api_responses_configuration"></p>
@@ -149,7 +149,7 @@ When using CachifyJS, you can configure various options to customize the caching
 
 - `postSync`: (recommended) An object that defines how the cache should be updated after the API response is returned. This is useful when you want to keep the cache up to date with new data periodically.
 
-    - `callback`: (required) A callback function that will be called with the API response after it has been cached.
+    - `callback`: (required) A callback function that will be called with the API response data after it has been cached.
 
     - `syncTimeout`: (optional) The number of milliseconds to wait before syncing the cache with new data. This is useful if you want to avoid syncing the cache too frequently.
       It's a one time call.
