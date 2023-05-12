@@ -107,6 +107,8 @@ function getProductList () {
     try {    
         //GET request only
         let response = await cachify(axiosConfig, cacheConfig)
+        //let response = await axios(axiosConfig)
+        //just replaced the axios() function with cachify()
         
         handleResponse (response)
     } catch (error) {
