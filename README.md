@@ -21,6 +21,11 @@ npm install cachifyjs
         - [Notes](#caching_api_responses_notes)
         - [Configuration](#caching_api_responses_configuration)
         - [Scenarios](#caching_api_responses_scenarios)
+    - [Get Cached Data](#get_cached_data)
+        - [Notes](#get_cached_data_notes)
+    - [Set Cached Data](#set_cached_data)
+        - [Notes](#set_cached_data_notes)
+        - [Configuration](#set_cached_data_configuration)
     - [Update Cached Data](#update_cached_data)
         - [Notes](#update_cached_data_notes)
         - [Configuration](#update_cached_data_configuration)
@@ -80,7 +85,7 @@ Here's an example:
 ```
 import {cachify} from "cachifyjs";
 
-function getProductList () {
+async function getProductList () {
     
     // configuration for api call
     const axiosConfig = {
@@ -130,6 +135,7 @@ function handleError (error) {
     //handle if any error occurs during data refreshing on api call (ex: authentication error)
 }
 ```
+
 <p id="caching_api_responses_notes"></p>
 
 #### Notes 
@@ -160,7 +166,7 @@ When using CachifyJS, you can configure various options to customize the caching
 
 - `postSync`: (recommended) An object that defines how the cache should be updated after the API response is returned. This is useful when you want to keep the cache up to date with new data periodically.
 
-    - `callback`: (required) A callback function that will be called with the API response data with a wrapper (ex: `{data: cachedData}`) after it has been cached.
+    - `callback`: (required) A callback function that will be called with the cached data with a wrapper (ex: `{data: cachedData}`) after it has been cached.
 
     - `syncTimeout`: (optional) The number of milliseconds to wait before syncing the cache with new data. This is useful if you want to avoid syncing the cache too frequently.
       It's a one time call.
@@ -171,7 +177,7 @@ When using CachifyJS, you can configure various options to customize the caching
 
 #### Scenarios 
 
-1. `Plain`: `CachifyJS` will try to get data from cache. If data found, no api call will be made. Otherwise, it will make the api call and return the response.
+1. `Plain`: `CachifyJS` will try to get data from cache. If data found, no api call will be made. Otherwise, it will make the api call, cache the data and return the cached data inside a wrapper.
    It's recommended to use `lifetime` for this case. After the cache being expired, new api call will be made to get fresh data.
    The `cacheConfig` should look like,
     ```
@@ -226,7 +232,7 @@ Here's an example:
 ```
 import {getCache} from "cachifyjs";
 
-function removeProductListCache () {
+async function getProductListCache () {
     const config = {
         key: `product/list?status=active`,//it must be the same as the cached key
     }
@@ -238,7 +244,19 @@ function removeProductListCache () {
         console.log ("Get Cache Error:", error)
     }
 }
+
+//handle cache response here
+function handleResponse (response) {
+    if (response.data) {
+        //handle the response data
+    }
+    else {
+        console.log(response)
+    }
+}
 ```
+
+<p id="get_cached_data_notes"></p>
 
 #### Notes
 
@@ -252,14 +270,14 @@ function removeProductListCache () {
 
 The `setCache` function allows you to set new cached data in your frontend application. The data could be api response, any app state, you name it.
 With this new feature, you can easily set any data in the cache without depending on any type of network request or API call.
-To set cached data, import the `setCache` function into your JavaScript file and pass a `config` and `data` to the 
-function. The function will  set new data in cache.
+To set cached data, import the `setCache` function into your JavaScript file and pass a `config` and `data` to the function. 
+The function will  set new data in cache.
 
 Here's an example:
 ```
 import {setCache} from "cachifyjs";
 
-function setWishListCache (data) {
+async function setWishListCache (data) {
     // configuration for updating
     const config = {
         key: `wishlist`,//Be sure to not use any key that has been used for any other cache
@@ -300,7 +318,7 @@ When setting new data, the `config` object passed to the `setCache` function acc
     - `secretKey` (required): To use encryption, you'll need to provide a secret key to the encryption configuration. This secret key will be
       used to encrypt and decrypt your data.
 
-- `after`: (recommended) An object that defines the events after the data has been set. This is useful when you want create an effect after the setting up cachde data.
+- `after`: (recommended) An object that defines the events after the data has been set. This is useful when you want create an effect after the setting up cached data.
 
     - `callback`: (required) A callback function that will be called with the cached data with a wrapper (ex: `{data: cachedData}`) after it has been cached.
 
@@ -316,7 +334,7 @@ Here's an example:
 ```
 import {updateCache} from "cachifyjs";
 
-function updateProductListCache (updatedData) {
+async function updateProductListCache (updatedData) {
     // configuration for updating
     const config = {
         key: `product/list?status=active`,//it must be the same as the cached key
@@ -379,7 +397,7 @@ Here's an example:
 ```
 import {removeCache} from "cachifyjs";
 
-function removeProductListCache () {
+async function removeProductListCache () {
     const config = {
         key: `product/list?status=active`,//it must be the same as the cached key
     }
