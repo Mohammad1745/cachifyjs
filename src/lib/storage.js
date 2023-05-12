@@ -15,8 +15,9 @@ export function getData (key, encryptionSecretKey=null)  {
             data = CryptoJS.AES.decrypt(data, encryptionSecretKey).toString(CryptoJS.enc.Utf8);
         }
         data =  JSON.parse(data);
-        return data
+        return {data}
     } catch (e) {
+        console.error(e.message)
         removeData(key);
         return {message: "Data not found",nodata:true};
     }

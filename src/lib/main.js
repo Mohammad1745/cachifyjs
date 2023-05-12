@@ -8,23 +8,23 @@ class CachifyCore {
     lifetime;
     preSync;
     postSync;
-    afterUpdate;
+    after;
     key;
     response;
 
     constructor () {
         this.axiosConfig = null;
         this.errorCallback = null;
-        this.lifetime = '2d';
+        this.lifetime = '7d';
         this.preSync = null;
         this.postSync = null;
-        this.afterUpdate = null;
+        this.after = null;
         this.key = null;
         this.encryption = null;
         this.response = {};
     }
 
-    async get (axiosConfig, cacheConfig) {
+    async cachify (axiosConfig, cacheConfig) {
         if (!cacheConfig) {
             console.error("No cacheConfig found!")
             return null;
@@ -39,12 +39,12 @@ class CachifyCore {
 
         if (this.preSync) {
             await this.refreshData();
-            this.response.data = getData(this.key, this.encryption?.secretKey);
+            this.response = getData(this.key, this.encryption?.secretKey);
         } else {
-            this.response.data = getData(this.key, this.encryption?.secretKey);
-            if (this.response.data.nodata) {
+            this.response = getData(this.key, this.encryption?.secretKey);
+            if (this.response.nodata) {
                 await this.refreshData();
-                this.response.data = getData(this.key, this.encryption?.secretKey);
+                this.response = getData(this.key, this.encryption?.secretKey);
             } else if (this.postSync && this.postSync.syncTimeout) {
                 const id = setTimeout(async () => {
                     await this.refreshData();
@@ -66,14 +66,22 @@ class CachifyCore {
         return this.response;
     }
 
-    async update (config, data) {
+    async get (config) {
+        this.setup(null, config);
+        this.removeExpiredData()
+        this.updateExpiration()
+
+        return getData(this.key, this.encryption?.secretKey);
+    }
+
+    async set (config, data) {
         this.setup(null, config);
         this.removeExpiredData()
         this.updateExpiration()
         setData(this.key, data, this.encryption?.secretKey);
-        if (this.afterUpdate) {
-            if (this.afterUpdate.callback) {
-                this.afterUpdate.callback( getData(this.key, this.encryption?.secretKey));
+        if (this.after) {
+            if (this.after.callback) {
+                this.after.callback( getData(this.key, this.encryption?.secretKey));
             }
         }
     }
@@ -90,7 +98,7 @@ class CachifyCore {
         this.lifetime = cacheConfig.lifetime ?? this.lifetime;
         this.preSync = cacheConfig.preSync;
         this.postSync = cacheConfig.postSync;
-        this.afterUpdate = cacheConfig.afterUpdate;
+        this.after = cacheConfig.after;
         this.key = cacheConfig.key;
         this.encryption = cacheConfig.encryption ?? this.encryption;
         this.response = {};
@@ -119,8 +127,8 @@ class CachifyCore {
         const currentTime = (new Date()).getTime()
         const expiration = currentTime + toMs(this.lifetime)
 
-        let expirations = getData('expirations');
-        if (expirations.nodata) expirations = []
+        let response = getData('expirations');
+        let expirations = response.nodata ? [] : response.data
         expirations = expirations.filter((item) => item.key != this.key);
         expirations.push({ key: this.key, expiration });
         setData('expirations', expirations);
@@ -130,8 +138,8 @@ class CachifyCore {
         const currentTime = (new Date()).getTime()
         const oneHourBeforeTime = currentTime - (1000 * 60 * 60)
 
-        let expirations = getData('expirations');
-        if (expirations.nodata) expirations = []
+        let response = getData('expirations');
+        let expirations = response.nodata ? [] : response.data
         const filtered = expirations.filter((item) => (item.key===this.key && item.expiration <= currentTime || item.expiration <= oneHourBeforeTime));
         if (filtered.length) {
             filtered.forEach(exItem => {
@@ -143,8 +151,8 @@ class CachifyCore {
     }
 
     updateInterval (id) {
-        let intervals = getData('intervals');
-        if(intervals.nodata) intervals = []
+        let response = getData('intervals');
+        let intervals = response.nodata ? [] : response.data
         const filtered = intervals.filter((item) => item.key == this.key);
         if (filtered.length) {
             filtered.forEach((item) => clearInterval(item.interval));
@@ -155,8 +163,8 @@ class CachifyCore {
     }
 
     updateTimeout (id) {
-        let timeouts = getData('timeouts');
-        if(timeouts.nodata) timeouts = []
+        let response = getData('timeouts');
+        let timeouts = response.nodata ? [] : response.data
         const filtered = timeouts.filter((item) => item.key == this.key);
         if (filtered.length) {
             filtered.forEach((item) => clearTimeout(item.timeout));

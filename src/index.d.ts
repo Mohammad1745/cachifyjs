@@ -19,8 +19,18 @@ interface CacheConfig {
     };
 }
 
-interface CachifyResponse {
-    data: any;
+interface CacheGetConfig {
+    key: string;
+}
+interface CacheSetConfig {
+    key: string;
+    lifetime?: number | string;
+    encryption?: {
+        secretKey: string;
+    };
+    after?: {
+        callback: (response: any) => any;
+    };
 }
 interface CacheUpdateConfig {
     key: string; // same as the cached key
@@ -28,7 +38,7 @@ interface CacheUpdateConfig {
     encryption?: {
         secretKey: string;
     };
-    afterUpdate?: {
+    after?: {
         callback: (response: any) => any;
     };
 }
@@ -39,7 +49,16 @@ interface CacheRemoveConfig {
 export function cachify(
     axiosConfig: AxiosConfig,
     cacheConfig: CacheConfig
-): Promise<CachifyResponse>;
+): Promise<any>;
+
+export function getCache(
+    config: CacheGetConfig
+): Promise<void>;
+
+export function setCache(
+    config: CacheSetConfig,
+    data: any
+): Promise<void>;
 
 export function updateCache(
     config: CacheUpdateConfig,
