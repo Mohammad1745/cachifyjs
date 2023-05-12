@@ -33,7 +33,7 @@ npm install cachifyjs
 
 ## What's new! (v2.3)
 
-- Cache `reponse` wrapper
+- Wrapper around cached data
 
   The return from `cachify` or `getCache` functions or the received parameter of `callback` function of either the `postSync` or the `after` property
   is the cached data with a wrapper around it. Thus, it's structure is similar to the axios api response.
