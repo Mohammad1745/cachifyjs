@@ -42,6 +42,7 @@ npm install cachifyjs
 
   The return from `cachify` or `getCache` functions or the received parameter of `callback` function of either the `postSync` or the `after` property
   is the cached data with a wrapper around it. Thus, it's structure is similar to the axios api response.
+
   If your cached data is like,
   ```
     const chachedData = {name: 'Ice cream', description: 'Cold'}
@@ -140,7 +141,7 @@ function handleError (error) {
 
 #### Notes 
 
-- `handleResponse`: The function has been used as `callback` in `postSync` or in `after` property and also been used to handle the `response` of api call.
+- `handleResponse`: The function has been used as `callback` in `postSync` property and also been used to handle the `response` of api call.
 - `handleError`: The function has been used as `errorCallback` in `cacheConfig` and also been used to handle the `error` on api call.
 
 <p id="caching_api_responses_configuration"></p>
@@ -260,8 +261,8 @@ function handleResponse (response) {
 
 #### Notes
 
-- `response`: `response` is a wrapper around the cached data. Ex: `{data: cachedData}` or `{message: 'Data not found'}`.
-- `handleResponse`: The function has been used as `callback` in `postSync` or in `after` property and also been used to handle the `response` of api call.
+- `response`: `response` is a wrapper around the cached data. Ex: `{data: cachedData}` or `{message: "Data not found",nodata:true}`.
+- `handleResponse`: The function has been used as `callback` in `after` property.
 
 
 <p id="set_cached_data"></p>
