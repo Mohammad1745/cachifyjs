@@ -240,7 +240,7 @@ import {setCache} from "cachifyjs";
 async function setWishListCache (data) {
     // configuration for updating
     const config = {
-        key: `wishlist`,//Be sure to not use any key that has been used for any other cache
+        key: `wishlist`,//Be sure to use unique key
         lifetime: '1h',
         encryption: {
             secretKey: 'my-secret-key'
@@ -293,7 +293,7 @@ Here's an example:
 ```
 import {getCache} from "cachifyjs";
 
-async function getProductListCache () {
+async function getWishListCache () {
     const config = {
         key: `wishlist`,    //it must be the same as the cached key
         encryption: {,      // if the cached data is ecrypted, the same encryption key is required.
