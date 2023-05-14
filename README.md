@@ -325,6 +325,25 @@ function handleResponse (response) {
 
 - `response`: `response` is a wrapper around the cached data. Ex: `{data: cachedData}` or `{message: "Data not found",nodata:true}`.
 - `handleResponse`: The function has been used as `callback` in `after` property.
+-
+<p id="get_cached_data_notes"></p>
+
+#### Notes
+
+- `handleResponse`: The function has been used to handle the api response previously. This callback will be called after the data has been updated.
+
+<p id="get_cached_data_configuration"></p>
+
+#### Configuration
+
+When getting data, the `config` object passed to the `getCache` function accepts the following properties:
+
+- `key`: (required) This `key` identifies the cached data. It's mandatory to keep it same to the key of the cached data.
+
+- `encryption` (optional): If the cached data is encrypted then it's mandatory.
+
+    - `secretKey` (required): To use encryption, you'll need to provide a secret key to the encryption configuration. This secret key will be
+      used to decrypt your data.
 
 
 <p id="update_cached_data"></p>
@@ -379,7 +398,7 @@ When updating data, the `config` object passed to the `updateCache` function acc
 
 - `lifetime` (optional): The amount of time in milliseconds that the cached response should be considered valid. After this time has elapsed, the cache will be invalidated.
 
-- `encryption` (optional): For sensitive data, encryption can be enabled. If the cached data is encrypted then it mandatory.
+- `encryption` (optional): For sensitive data, encryption can be enabled. If the cached data is encrypted then it's mandatory.
 
     - `secretKey` (required): To use encryption, you'll need to provide a secret key to the encryption configuration. This secret key will be
       used to encrypt and decrypt your data.
