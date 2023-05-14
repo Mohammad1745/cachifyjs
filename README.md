@@ -26,6 +26,7 @@ npm install cachifyjs
         - [Configuration](#set_cached_data_configuration)
     - [Get Cached Data](#get_cached_data)
         - [Notes](#get_cached_data_notes)
+        - [Configuration](#get_cached_data_configuration)
     - [Update Cached Data](#update_cached_data)
         - [Notes](#update_cached_data_notes)
         - [Configuration](#update_cached_data_configuration)
@@ -326,11 +327,6 @@ function handleResponse (response) {
 - `response`: `response` is a wrapper around the cached data. Ex: `{data: cachedData}` or `{message: "Data not found",nodata:true}`.
 - `handleResponse`: The function has been used as `callback` in `after` property.
 -
-<p id="get_cached_data_notes"></p>
-
-#### Notes
-
-- `handleResponse`: The function has been used to handle the api response previously. This callback will be called after the data has been updated.
 
 <p id="get_cached_data_configuration"></p>
 
