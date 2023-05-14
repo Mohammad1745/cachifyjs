@@ -21,6 +21,9 @@ interface CacheConfig {
 
 interface CacheGetConfig {
     key: string;
+    encryption?: {
+        secretKey: string;
+    };
 }
 interface CacheSetConfig {
     key: string;
@@ -53,7 +56,7 @@ export function cachify(
 
 export function getCache(
     config: CacheGetConfig
-): Promise<void>;
+): Promise<any>;
 
 export function setCache(
     config: CacheSetConfig,

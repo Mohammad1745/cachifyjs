@@ -21,11 +21,11 @@ npm install cachifyjs
         - [Notes](#caching_api_responses_notes)
         - [Configuration](#caching_api_responses_configuration)
         - [Scenarios](#caching_api_responses_scenarios)
-    - [Get Cached Data](#get_cached_data)
-        - [Notes](#get_cached_data_notes)
     - [Set Cached Data](#set_cached_data)
         - [Notes](#set_cached_data_notes)
         - [Configuration](#set_cached_data_configuration)
+    - [Get Cached Data](#get_cached_data)
+        - [Notes](#get_cached_data_notes)
     - [Update Cached Data](#update_cached_data)
         - [Notes](#update_cached_data_notes)
         - [Configuration](#update_cached_data_configuration)
@@ -223,51 +223,9 @@ When using CachifyJS, you can configure various options to customize the caching
     2. `syncInterval`: The time interval for the api call. It's a repetitive process. It works in background.
 
 
-<p id="get_cached_data"></p>
-
-### 2. Get Cached Data:
-
-The `getCache` function allows you to get the cached data from your frontend application without complex configuration or subsequent api call.
-
-Here's an example:
-```
-import {getCache} from "cachifyjs";
-
-async function getProductListCache () {
-    const config = {
-        key: `product/list?status=active`,//it must be the same as the cached key
-    }
-
-    try {    
-        const response = await getCache(config);
-        handleResponse(response)
-    } catch (error) {
-        console.log ("Get Cache Error:", error)
-    }
-}
-
-//handle cache response here
-function handleResponse (response) {
-    if (response.data) {
-        //handle the response data
-    }
-    else {
-        console.log(response)
-    }
-}
-```
-
-<p id="get_cached_data_notes"></p>
-
-#### Notes
-
-- `response`: `response` is a wrapper around the cached data. Ex: `{data: cachedData}` or `{message: "Data not found",nodata:true}`.
-- `handleResponse`: The function has been used as `callback` in `after` property.
-
-
 <p id="set_cached_data"></p>
 
-### 3. Set Cached Data: 
+### 2. Set Cached Data: 
 
 The `setCache` function allows you to set new cached data in your frontend application. The data could be api response, any app state, you name it.
 With this new feature, you can easily set any data in the cache without depending on any type of network request or API call.
@@ -322,6 +280,51 @@ When setting new data, the `config` object passed to the `setCache` function acc
 - `after`: (recommended) An object that defines the events after the data has been set. This is useful when you want create an effect after the setting up cached data.
 
     - `callback`: (required) A callback function that will be called with the cached data with a wrapper (ex: `{data: cachedData}`) after it has been cached.
+
+
+<p id="get_cached_data"></p>
+
+### 3. Get Cached Data:
+
+The `getCache` function allows you to get the cached data from your frontend application without complex configuration or subsequent api call.
+
+Here's an example:
+```
+import {getCache} from "cachifyjs";
+
+async function getProductListCache () {
+    const config = {
+        key: `wishlist`,    //it must be the same as the cached key
+        encryption: {,      // if the cached data is ecrypted, the same encryption key is required.
+            secretKey: 'my-secret-key'
+        },
+    }
+
+    try {    
+        const response = await getCache(config);
+        handleResponse(response)
+    } catch (error) {
+        console.log ("Get Cache Error:", error)
+    }
+}
+
+//handle cache response here
+function handleResponse (response) {
+    if (response.data) {
+        //handle the response data
+    }
+    else {
+        console.log(response)
+    }
+}
+```
+
+<p id="get_cached_data_notes"></p>
+
+#### Notes
+
+- `response`: `response` is a wrapper around the cached data. Ex: `{data: cachedData}` or `{message: "Data not found",nodata:true}`.
+- `handleResponse`: The function has been used as `callback` in `after` property.
 
 
 <p id="update_cached_data"></p>
