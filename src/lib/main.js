@@ -1,6 +1,11 @@
 import axios from "axios";
 import toMs from "./ts.js";
 import {getData, setData, removeData} from "./storage.js";
+import {
+    EXPIRATIONS_ENC_KEY,EXPIRATIONS_LS_KEY,
+    INTERVALS_ENC_KEY,INTERVALS_LS_KEY,
+    TIMEOUTS_ENC_KEY,TIMEOUTS_LS_KEY
+} from "./consts.js";
 
 class CachifyCore {
     axiosConfig;
@@ -127,18 +132,18 @@ class CachifyCore {
         const currentTime = (new Date()).getTime()
         const expiration = currentTime + toMs(this.lifetime)
 
-        let response = getData('expirations');
+        let response = getData(EXPIRATIONS_LS_KEY, EXPIRATIONS_ENC_KEY);
         let expirations = response.nodata ? [] : response.data
         expirations = expirations.filter((item) => item.key != this.key);
         expirations.push({ key: this.key, expiration });
-        setData('expirations', expirations);
+        setData(EXPIRATIONS_LS_KEY, expirations, EXPIRATIONS_ENC_KEY);
     }
 
     removeExpiredData () {
         const currentTime = (new Date()).getTime()
         const oneHourBeforeTime = currentTime - (1000 * 60 * 60)
 
-        let response = getData('expirations');
+        let response = getData(EXPIRATIONS_LS_KEY, EXPIRATIONS_ENC_KEY);
         let expirations = response.nodata ? [] : response.data
         const filtered = expirations.filter((item) => (item.key===this.key && item.expiration <= currentTime || item.expiration <= oneHourBeforeTime));
         if (filtered.length) {
@@ -146,12 +151,12 @@ class CachifyCore {
                 expirations = expirations.filter((item) => exItem.key !== item.key);
                 removeData(exItem.key)
             })
-            setData('expirations', expirations);
+            setData(EXPIRATIONS_LS_KEY, expirations, EXPIRATIONS_ENC_KEY);
         }
     }
 
     updateInterval (id) {
-        let response = getData('intervals');
+        let response = getData(INTERVALS_LS_KEY, INTERVALS_ENC_KEY);
         let intervals = response.nodata ? [] : response.data
         const filtered = intervals.filter((item) => item.key == this.key);
         if (filtered.length) {
@@ -159,11 +164,11 @@ class CachifyCore {
             intervals = intervals.filter((item) => item.key != this.key);
         }
         intervals.push({ key: this.key, id });
-        setData('intervals', intervals);
+        setData(INTERVALS_LS_KEY, intervals, INTERVALS_ENC_KEY);
     }
 
     updateTimeout (id) {
-        let response = getData('timeouts');
+        let response = getData(TIMEOUTS_LS_KEY, TIMEOUTS_ENC_KEY);
         let timeouts = response.nodata ? [] : response.data
         const filtered = timeouts.filter((item) => item.key == this.key);
         if (filtered.length) {
@@ -171,7 +176,7 @@ class CachifyCore {
             timeouts = timeouts.filter((item) => item.key != this.key);
         }
         timeouts.push({ key: this.key, id });
-        setData('timeouts', timeouts);
+        setData(TIMEOUTS_LS_KEY, timeouts, TIMEOUTS_ENC_KEY);
     }
 };
 export default CachifyCore;

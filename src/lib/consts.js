@@ -1,0 +1,6 @@
+export const TIMEOUTS_LS_KEY = 'cFYtTs'
+export const TIMEOUTS_ENC_KEY = 'cFYtTseN'
+export const INTERVALS_LS_KEY = 'cFYIvS'
+export const INTERVALS_ENC_KEY = 'cFYIvSeN'
+export const EXPIRATIONS_LS_KEY = 'cFYeTS'
+export const EXPIRATIONS_ENC_KEY = 'cFYeTSeN'

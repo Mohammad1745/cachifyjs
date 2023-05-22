@@ -15,7 +15,7 @@ npm install cachifyjs
 <p id="table_of_contents"></p>
 
 ## Table of Contents 
-- [What's new! (v2.2)](#whats_new)
+- [What's new! (v2.3)](#whats_new)
 - [Guides](#guides)
     - [Caching API Response](#caching_api_responses)
         - [Notes](#caching_api_responses_notes)
