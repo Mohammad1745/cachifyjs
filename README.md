@@ -39,6 +39,12 @@ npm install cachifyjs
 
 ## What's new! (v2.3)
 
+
+- `key` encryption
+
+  Keys of the encrypted data will also be encrypted to ensure data security.
+
+
 - Wrapper around cached data
 
   The return from `cachify` or `getCache` functions or the received parameter of `callback` function of either the `postSync` or the `after` property
@@ -326,7 +332,6 @@ function handleResponse (response) {
 
 - `response`: `response` is a wrapper around the cached data. Ex: `{data: cachedData}` or `{message: "Data not found",nodata:true}`.
 - `handleResponse`: The function has been used as `callback` in `after` property.
--
 
 <p id="get_cached_data_configuration"></p>
 

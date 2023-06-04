@@ -1,3 +1,6 @@
+export const MASTER_KEY = 'cFYmRk'
+export const MASTER_ENC_KEY = 'cFYmRkeN'
+export const LS_KEY_PREFIX = 'cFYd'
 export const TIMEOUTS_LS_KEY = 'cFYtTs'
 export const TIMEOUTS_ENC_KEY = 'cFYtTseN'
 export const INTERVALS_LS_KEY = 'cFYIvS'
