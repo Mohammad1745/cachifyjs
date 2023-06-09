@@ -170,6 +170,11 @@ class CachifyCore {
             this.keyMap.push({ key: this.key, keyLS: this.keyLS});
         }
         setData(MASTER_KEY, this.keyMap, MASTER_ENC_KEY);
+
+        //make separated function in next version (removeUntrackedData)
+        this.keyMap.forEach(item => {
+            if (item.key !== item.keyLS) removeData(item.key)
+        })
     }
 
     updateExpiration () {
