@@ -150,6 +150,8 @@ function handleError (error) {
 
 - `handleResponse`: The function has been used as `callback` in `postSync` property and also been used to handle the `response` of api call.
 - `handleError`: The function has been used as `errorCallback` in `cacheConfig` and also been used to handle the `error` on api call.
+- Time specifier: CahcifyJS has 5 time specifiers `s`, `m`, `h`, `d` and `w` for seconds, minutes, hours, days and weeks respectively. If no specifier is provided, the value will be
+  considered as milliseconds.
 
 <p id="caching_api_responses_configuration"></p>
 

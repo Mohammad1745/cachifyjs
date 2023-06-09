@@ -2,9 +2,7 @@ import axios from "axios";
 import toMs from "./ts.js";
 import {getData, setData, removeData} from "./storage.js";
 import {
-    EXPIRATIONS_ENC_KEY, EXPIRATIONS_LS_KEY,
-    INTERVALS_ENC_KEY, INTERVALS_LS_KEY, LS_KEY_PREFIX, MASTER_ENC_KEY, MASTER_KEY,
-    TIMEOUTS_ENC_KEY, TIMEOUTS_LS_KEY
+    EXPIRATIONS_LS_KEY, INTERVALS_LS_KEY, LS_KEY_PREFIX, MASTER_ENC_KEY, MASTER_KEY, TIMEOUTS_LS_KEY
 } from "./consts.js";
 
 class CachifyCore {
@@ -141,6 +139,15 @@ class CachifyCore {
         const response = getData(MASTER_KEY, MASTER_ENC_KEY);
         this.keyMap = response.nodata ? [] : response.data
 
+        //make separated function in next version (removeUntrackedData)
+        const lsKeys = Object.keys(localStorage);
+        lsKeys.forEach(lsKey => {
+            if (lsKey.startsWith(LS_KEY_PREFIX)) {
+                const items = this.keyMap.filter(item => item.keyLS == lsKey)
+                if (!items.length) removeData(lsKey)
+            }
+        })
+
         const filtered = this.keyMap.filter((item) => item.key == this.key);
         if (filtered.length) {
             this.keyLS = filtered[0].keyLS
@@ -148,7 +155,8 @@ class CachifyCore {
             if (this.encryption?.secretKey && this.keyLS == this.key) {
                 this.keyLS = uniqueLSKey
                 this.keyMap = this.keyMap.filter((item) => item.key != this.key)
-                this.keyMap.push({ key: this.key, keyLS: this.keyLS});
+                filtered[0].keyLS = this.keyLS
+                this.keyMap.push(filtered[0]);
 
                 const response = getData(this.key)
                 removeData(this.key)
@@ -168,51 +176,60 @@ class CachifyCore {
         const currentTime = (new Date()).getTime()
         const expiration = currentTime + toMs(this.lifetime)
 
-        let response = getData(EXPIRATIONS_LS_KEY,EXPIRATIONS_ENC_KEY);
-        let expirations = response.nodata ? [] : response.data
-        expirations = expirations.filter((item) => item.key != this.keyLS);
-        expirations.push({ key: this.keyLS, expiration });
-        setData(EXPIRATIONS_LS_KEY, expirations, EXPIRATIONS_ENC_KEY);
+        const response = getData(MASTER_KEY, MASTER_ENC_KEY);
+        this.keyMap = response.nodata ? [] : response.data
+        let filtered = this.keyMap.filter((item) => item.key == this.key);
+        if (filtered.length) {
+            this.keyMap = this.keyMap.filter((item) => item.key != this.key)
+            filtered[0].expiration = expiration
+            this.keyMap.push(filtered[0]);
+            setData(MASTER_KEY, this.keyMap, MASTER_ENC_KEY);
+        }
+        removeData(EXPIRATIONS_LS_KEY)//remove in next version
     }
 
     removeExpiredData () {
         const currentTime = (new Date()).getTime()
-        const oneHourBeforeTime = currentTime - (1000 * 60 * 60)
+        const oneHourBeforeTime = currentTime - toMs('1h')
 
-        let response = getData(EXPIRATIONS_LS_KEY,EXPIRATIONS_ENC_KEY);
-        let expirations = response.nodata ? [] : response.data
-        const filtered = expirations.filter((item) => (item.key===this.keyLS && item.expiration <= currentTime || item.expiration <= oneHourBeforeTime));
+        const response = getData(MASTER_KEY, MASTER_ENC_KEY);
+        this.keyMap = response.nodata ? [] : response.data
+        const filtered = this.keyMap.filter((item) => (item.key===this.key && item.expiration <= currentTime || item.expiration <= oneHourBeforeTime));
         if (filtered.length) {
             filtered.forEach(exItem => {
-                expirations = expirations.filter((item) => exItem.key !== item.key);
+                this.keyMap = this.keyMap.filter((item) => exItem.key !== item.key);
                 removeData(exItem.key)
             })
-            setData(EXPIRATIONS_LS_KEY, expirations, EXPIRATIONS_ENC_KEY);
+            setData(MASTER_KEY, this.keyMap, MASTER_ENC_KEY);
         }
     }
 
     updateInterval (id) {
-        let response = getData(INTERVALS_LS_KEY, INTERVALS_ENC_KEY);
-        let intervals = response.nodata ? [] : response.data
-        const filtered = intervals.filter((item) => item.key == this.keyLS);
+        const response = getData(MASTER_KEY, MASTER_ENC_KEY);
+        this.keyMap = response.nodata ? [] : response.data
+        let filtered = this.keyMap.filter((item) => item.key == this.key);
         if (filtered.length) {
             filtered.forEach((item) => clearInterval(item.interval));
-            intervals = intervals.filter((item) => item.key != this.keyLS);
+            this.keyMap = this.keyMap.filter((item) => item.key != this.key)
+            filtered[0].interval = id
+            this.keyMap.push(filtered[0]);
+            setData(MASTER_KEY, this.keyMap, MASTER_ENC_KEY);
         }
-        intervals.push({ key: this.keyLS, id });
-        setData(INTERVALS_LS_KEY, intervals, INTERVALS_ENC_KEY);
+        removeData(INTERVALS_LS_KEY);//remove in next version
     }
 
     updateTimeout (id) {
-        let response = getData(TIMEOUTS_LS_KEY, TIMEOUTS_ENC_KEY);
-        let timeouts = response.nodata ? [] : response.data
-        const filtered = timeouts.filter((item) => item.key == this.keyLS);
+        const response = getData(MASTER_KEY, MASTER_ENC_KEY);
+        this.keyMap = response.nodata ? [] : response.data
+        let filtered = this.keyMap.filter((item) => item.key == this.key);
         if (filtered.length) {
             filtered.forEach((item) => clearTimeout(item.timeout));
-            timeouts = timeouts.filter((item) => item.key != this.keyLS);
+            this.keyMap = this.keyMap.filter((item) => item.key != this.key)
+            filtered[0].timeout = id
+            this.keyMap.push(filtered[0]);
+            setData(MASTER_KEY, this.keyMap, MASTER_ENC_KEY);
         }
-        timeouts.push({ key: this.keyLS, id });
-        setData(TIMEOUTS_LS_KEY, timeouts, TIMEOUTS_ENC_KEY);
+        removeData(TIMEOUTS_LS_KEY);//remove in next version
     }
 };
 export default CachifyCore;
