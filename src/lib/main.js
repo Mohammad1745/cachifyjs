@@ -78,7 +78,6 @@ class CachifyCore {
         this.setup(null, config);
         this.updateKeyMap()
         this.removeExpiredData()
-        this.updateExpiration()
 
         return getData(this.keyLS, this.encryption?.secretKey);
     }
