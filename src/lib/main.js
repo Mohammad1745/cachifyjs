@@ -213,7 +213,9 @@ class CachifyCore {
         this.keyMap = response.nodata ? [] : response.data
         let filtered = this.keyMap.filter((item) => item.key == this.key);
         if (filtered.length) {
-            filtered.forEach((item) => clearInterval(item.interval));
+            filtered.forEach((item) => {
+                if (item.interval != id) clearInterval(item.interval)
+            });
             this.keyMap = this.keyMap.filter((item) => item.key != this.key)
             filtered[0].interval = id
             this.keyMap.push(filtered[0]);
@@ -227,7 +229,9 @@ class CachifyCore {
         this.keyMap = response.nodata ? [] : response.data
         let filtered = this.keyMap.filter((item) => item.key == this.key);
         if (filtered.length) {
-            filtered.forEach((item) => clearTimeout(item.timeout));
+            filtered.forEach((item) => {
+                if (item.timeout != id) clearTimeout(item.timeout)
+            });
             this.keyMap = this.keyMap.filter((item) => item.key != this.key)
             filtered[0].timeout = id
             this.keyMap.push(filtered[0]);
