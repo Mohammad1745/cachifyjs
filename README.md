@@ -31,6 +31,7 @@ npm install cachifyjs
         - [Notes](#update_cached_data_notes)
         - [Configuration](#update_cached_data_configuration)
     - [Remove Cached Data](#remove_cached_data)
+- [Change Log](#change_log)
 - [Dependencies](#dependencies)
 - [Conclusion & Feedback](#conclusion)
 
@@ -62,18 +63,6 @@ npm install cachifyjs
   ```
     const response = {message: "Data not found",nodata:true}
   ```
-
-- `setCache` function
-
-  The `setCache` function is one of the latest additions to the CachifyJS package, and it allows you to set new cached data in your
-  frontend application. The data could be api response, any app state, you name it. With this new feature, you can easily set any data in the cache
-  without depending on any type of network request or API call.
-
-
-- `getCache` function
-
-  The `getCache` function is one of the latest additions to the CachifyJS package, and it allows you to get the cached data from your
-  frontend application without complex configuration.
 
 
 <p id="guides"></p>
@@ -112,6 +101,7 @@ async function getProductList () {
         },
         postSync: {
             callback: handleResponse,
+            skipApiCallFor: '10s',
             syncTimeout: 1, //default (ms)
             syncInterval: '3h', //with time specifier
         },
@@ -177,11 +167,13 @@ When using CachifyJS, you can configure various options to customize the caching
 - `postSync`: (recommended) An object that defines how the cache should be updated after the API response is returned. This is useful when you want to keep the cache up to date with new data periodically.
 
     - `callback`: (required) A callback function that will be called with the cached data with a wrapper (ex: `{data: cachedData}`) after it has been cached.
+      
+    - `skipApiCallFor`: (optional) The amount of time to skip api call. If any api call is made too frequently and we want to reduce the call, we may use this configuration.
 
-    - `syncTimeout`: (optional) The number of milliseconds to wait before syncing the cache with new data. This is useful if you want to avoid syncing the cache too frequently.
+    - `syncTimeout`: (optional) The amount of time to wait before syncing the cache with new data. This is useful if you want to avoid syncing the cache too frequently.
       It's a one time call.
 
-    - `syncInterval`: (optional) The number of milliseconds to wait before syncing the cache again. This is useful if you want to periodically update the cache with new data.
+    - `syncInterval`: (optional) The amount of time to wait before syncing the cache again. This is useful if you want to periodically update the cache with new data.
 
 <p id="caching_api_responses_scenarios"></p>
 
@@ -222,14 +214,16 @@ When using CachifyJS, you can configure various options to customize the caching
         lifetime: '1h',
         postSync: {
            callback: handleResponse,
+           skipApiCallFor: '10s',
            syncTimeout: 1,//default (ms)
            syncInterval: '3h',
         },
     }
     ```
    Notes:
-    1. `syncTimeout`: The time delay after that api call will be made. It's a one time call.
-    2. `syncInterval`: The time interval for the api call. It's a repetitive process. It works in background.
+    1. `skipApiCallFor`: The amount of time to skip api call.
+    2. `syncTimeout`: The time delay after that api call will be made. It's a one time call.
+    3. `syncInterval`: The time interval for the api call. It's a repetitive process. It works in background.
 
 
 <p id="set_cached_data"></p>
@@ -435,6 +429,20 @@ async function removeProductListCache () {
     }
 }
 ```
+
+<p id="change_log"></p>
+
+## Change Log (v2.3)
+
+- Version `2.3.8` (2023-06-28)
+
+  - Skip Api Call: The `skipApiCallFor` property inside `postSync` property of `cacheConfig` for function `cachify()` allows
+    us to skip api calls. If any api call is made too frequently and we want to reduce the call, we may use this configuration.
+
+- Version `2.3.7` (2023-06-19)
+
+  - Fixed the issue: Not calling api if data is cached even if `postsync` is enabled.
+
 
 <p id="dependencies"></p>
 

@@ -55,8 +55,11 @@ class CachifyCore {
                 this.response = getData(this.keyLS, this.encryption?.secretKey);
             } else if (this.postSync && this.postSync.syncTimeout) {
                 const id = setTimeout(async () => {
-                    await this.refreshData();
-                    this.postSync.callback( getData(this.keyLS, this.encryption?.secretKey));
+                    const callSkip = this.checkCallSkip()
+                    if (!callSkip) {
+                        await this.refreshData();
+                        this.postSync.callback(getData(this.keyLS, this.encryption?.secretKey));
+                    }
                 }, toMs( this.postSync.syncTimeout));
 
                 this.updateTimeout(id);
@@ -64,8 +67,11 @@ class CachifyCore {
 
             if (this.postSync && this.postSync.syncInterval) {
                 const id = setInterval(async () => {
-                    await this.refreshData();
-                    this.postSync.callback( getData(this.keyLS, this.encryption?.secretKey));
+                    const callSkip = this.checkCallSkip()
+                    if (!callSkip) {
+                        await this.refreshData();
+                        this.postSync.callback(getData(this.keyLS, this.encryption?.secretKey));
+                    }
                 }, toMs( this.postSync.syncInterval));
 
                 this.updateInterval(id);
@@ -206,6 +212,27 @@ class CachifyCore {
             })
             setData(MASTER_KEY, this.keyMap, MASTER_ENC_KEY);
         }
+    }
+
+    checkCallSkip () {
+        if (!this.postSync?.skipApiCallFor) return false
+
+        const currentTime = (new Date()).getTime()
+        const skipUpdate = currentTime + toMs(this.postSync.skipApiCallFor)
+
+        const response = getData(MASTER_KEY, MASTER_ENC_KEY);
+        this.keyMap = response.nodata ? [] : response.data
+        let filtered = this.keyMap.filter((item) => item.key == this.key);
+
+        if (!filtered.length) return false
+        else if (!filtered[0].skipTill || filtered[0].skipTill < currentTime) {
+            this.keyMap = this.keyMap.filter((item) => item.key != this.key)
+            filtered[0].skipTill = skipUpdate
+            this.keyMap.push(filtered[0]);
+            setData(MASTER_KEY, this.keyMap, MASTER_ENC_KEY);
+            return false
+        }
+        else return true
     }
 
     updateInterval (id) {

@@ -14,6 +14,7 @@ interface CacheConfig {
     preSync?: boolean;
     postSync?: {
         callback: (response: any) => void;
+        skipApiCallFor?: number | string;
         syncTimeout?: number | string;
         syncInterval?: number | string;
     };
