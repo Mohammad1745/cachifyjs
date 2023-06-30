@@ -168,7 +168,8 @@ When using CachifyJS, you can configure various options to customize the caching
 
     - `callback`: (required) A callback function that will be called with the cached data with a wrapper (ex: `{data: cachedData}`) after it has been cached.
       
-    - `skipApiCallFor`: (optional) The amount of time to skip api call. If any api call is made too frequently and we want to reduce the call, we may use this configuration.
+    - `skipApiCallFor`: (optional) The amount of time to skip api call. If any api call is made too frequently and we want to reduce the call, we may use this configuration. Then any call
+       to `cachify()` function with give data from cache without api call withing this time period.
 
     - `syncTimeout`: (optional) The amount of time to wait before syncing the cache with new data. This is useful if you want to avoid syncing the cache too frequently.
       It's a one time call.

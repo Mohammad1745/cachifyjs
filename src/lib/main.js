@@ -2,7 +2,7 @@ import axios from "axios";
 import toMs from "./ts.js";
 import {getData, setData, removeData} from "./storage.js";
 import {
-    EXPIRATIONS_LS_KEY, INTERVALS_LS_KEY, LS_KEY_PREFIX, MASTER_ENC_KEY, MASTER_KEY, TIMEOUTS_LS_KEY
+    EXPIRATIONS_LS_KEY, INTERVALS_LS_KEY, LS_KEY_PREFIX, MASTER_KEY, MASTER_ENC_KEY, TIMEOUTS_LS_KEY
 } from "./consts.js";
 
 class CachifyCore {
@@ -92,7 +92,7 @@ class CachifyCore {
         this.setup(null, config);
         this.updateKeyMap()
         this.removeExpiredData()
-        this.updateExpiration()
+        this.updateTimestamps()
         setData(this.keyLS, data, this.encryption?.secretKey);
         if (this.after) {
             if (this.after.callback) {
@@ -124,7 +124,7 @@ class CachifyCore {
         try {
             let response = await axios(this.axiosConfig);
             if (response.data) {
-                this.updateExpiration()
+                this.updateTimestamps()
                 setData(this.keyLS, response.data, this.encryption?.secretKey);
             } else {
                 throw new Error(response.response);
@@ -143,15 +143,7 @@ class CachifyCore {
         const uniqueLSKey = LS_KEY_PREFIX + (new Date()).getTime()
         const response = getData(MASTER_KEY, MASTER_ENC_KEY);
         this.keyMap = response.nodata ? [] : response.data
-
-        //make separated function in next version (removeUntrackedData)
-        const lsKeys = Object.keys(localStorage);
-        lsKeys.forEach(lsKey => {
-            if (lsKey.startsWith(LS_KEY_PREFIX)) {
-                const items = this.keyMap.filter(item => item.keyLS == lsKey)
-                if (!items.length) removeData(lsKey)
-            }
-        })
+        this.removeUntrackedEncryptedData()
 
         const filtered = this.keyMap.filter((item) => item.key == this.key);
         if (filtered.length) {
@@ -177,12 +169,26 @@ class CachifyCore {
         setData(MASTER_KEY, this.keyMap, MASTER_ENC_KEY);
 
         //make separated function in next version (removeUntrackedData)
+        this.removeUntrackedNonEncryptedData()
+    }
+
+    removeUntrackedEncryptedData () {
+        const lsKeys = Object.keys(localStorage);
+        lsKeys.forEach(lsKey => {
+            if (lsKey.startsWith(LS_KEY_PREFIX)) {
+                const items = this.keyMap.filter(item => item.keyLS == lsKey)
+                if (!items.length) removeData(lsKey)
+            }
+        })
+    }
+
+    removeUntrackedNonEncryptedData () {
         this.keyMap.forEach(item => {
             if (item.key !== item.keyLS) removeData(item.key)
         })
     }
 
-    updateExpiration () {
+    updateTimestamps () {
         const currentTime = (new Date()).getTime()
         const expiration = currentTime + toMs(this.lifetime)
 
@@ -191,6 +197,7 @@ class CachifyCore {
         let filtered = this.keyMap.filter((item) => item.key == this.key);
         if (filtered.length) {
             this.keyMap = this.keyMap.filter((item) => item.key != this.key)
+            filtered[0].updatedAt = currentTime
             filtered[0].expiration = expiration
             this.keyMap.push(filtered[0]);
             setData(MASTER_KEY, this.keyMap, MASTER_ENC_KEY);
@@ -218,21 +225,16 @@ class CachifyCore {
         if (!this.postSync?.skipApiCallFor) return false
 
         const currentTime = (new Date()).getTime()
-        const skipUpdate = currentTime + toMs(this.postSync.skipApiCallFor)
+        const skipFrom = currentTime - toMs(this.postSync.skipApiCallFor)
 
         const response = getData(MASTER_KEY, MASTER_ENC_KEY);
         this.keyMap = response.nodata ? [] : response.data
-        let filtered = this.keyMap.filter((item) => item.key == this.key);
+        let filtered = this.keyMap.filter((item) => item.key === this.key);
 
         if (!filtered.length) return false
-        else if (!filtered[0].skipTill || filtered[0].skipTill < currentTime) {
-            this.keyMap = this.keyMap.filter((item) => item.key != this.key)
-            filtered[0].skipTill = skipUpdate
-            this.keyMap.push(filtered[0]);
-            setData(MASTER_KEY, this.keyMap, MASTER_ENC_KEY);
-            return false
-        }
-        else return true
+        if (!filtered[0].updatedAt) return false
+
+        return filtered[0].updatedAt > skipFrom;
     }
 
     updateInterval (id) {
