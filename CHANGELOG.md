@@ -1,3 +1,7 @@
+## Version 2.3.9 - 2023-06-30
+
+- The skip api call feature has been updated to check previous api call timestamp and determine the skip functionality.
+
 ## Version 2.3.8 - 2023-06-28
 
 - Skip Api Call: The `skipApiCallFor` property inside `postSync` property of `cacheConfig` for function `cachify()` allows 
