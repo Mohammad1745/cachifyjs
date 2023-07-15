@@ -1,13 +1,24 @@
-export function setData (key, data) {
-    localStorage.setItem(key, JSON.stringify(data));
+import CryptoJS from "crypto-js"
+
+export function setData (key, data, encryptionSecretKey=null) {
+    let  dataString = JSON.stringify(data)
+    if (encryptionSecretKey) {
+        dataString = CryptoJS.AES.encrypt(dataString, encryptionSecretKey).toString();
+    }
+    localStorage.setItem(key, dataString);
 }
-export function getData (key)  {
+export function getData (key, encryptionSecretKey=null)  {
     try {
         let data = localStorage.getItem(key);
-        if (data) return JSON.parse(data);
-        return {message: "Data not found",nodata:true};
+        if (!data) return {message: "Data not found",nodata:true};
+        if (encryptionSecretKey) {
+            data = CryptoJS.AES.decrypt(data, encryptionSecretKey).toString(CryptoJS.enc.Utf8);
+        }
+        data =  JSON.parse(data);
+        return {data}
     } catch (e) {
-        localStorage.removeItem(key);
+        console.error(e.message)
+        removeData(key);
         return {message: "Data not found",nodata:true};
     }
 }

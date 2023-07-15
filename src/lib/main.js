@@ -1,27 +1,37 @@
 import axios from "axios";
-import toMs from "./ts";
-import {getData, setData, removeData} from "./storage";
+import toMs from "./ts.js";
+import {getData, setData, removeData} from "./storage.js";
+import {
+    EXPIRATIONS_LS_KEY, INTERVALS_LS_KEY, LS_KEY_PREFIX, MASTER_KEY, MASTER_ENC_KEY, TIMEOUTS_LS_KEY
+} from "./consts.js";
 
-class CachifyJS {
+class CachifyCore {
     axiosConfig;
     errorCallback;
     lifetime;
     preSync;
     postSync;
+    after;
     key;
+    keyLS;
+    keyMap;
     response;
 
     constructor () {
         this.axiosConfig = null;
         this.errorCallback = null;
-        this.lifetime = '2d';
+        this.lifetime = '7d';
         this.preSync = null;
         this.postSync = null;
+        this.after = null;
         this.key = null;
+        this.keyLS = null;
+        this.keyMap = [];
+        this.encryption = null;
         this.response = {};
     }
 
-    async get (axiosConfig, cacheConfig) {
+    async cachify (axiosConfig, cacheConfig) {
         if (!cacheConfig) {
             console.error("No cacheConfig found!")
             return null;
@@ -32,20 +42,24 @@ class CachifyJS {
         }
 
         this.setup(axiosConfig, cacheConfig);
+        this.updateKeyMap()
         this.removeExpiredData()
 
         if (this.preSync) {
             await this.refreshData();
-            this.response.data = getData(this.key);
+            this.response = getData(this.keyLS, this.encryption?.secretKey);
         } else {
-            this.response.data = getData(this.key);
-            if (this.response.data.nodata) {
+            this.response = getData(this.keyLS, this.encryption?.secretKey);
+            if (this.response.nodata) {
                 await this.refreshData();
-                this.response.data = getData(this.key);
+                this.response = getData(this.keyLS, this.encryption?.secretKey);
             } else if (this.postSync && this.postSync.syncTimeout) {
                 const id = setTimeout(async () => {
-                    await this.refreshData();
-                    this.postSync.callback( getData(this.key));
+                    const callSkip = this.checkCallSkip()
+                    if (!callSkip) {
+                        await this.refreshData();
+                        this.postSync.callback(getData(this.keyLS, this.encryption?.secretKey));
+                    }
                 }, toMs( this.postSync.syncTimeout));
 
                 this.updateTimeout(id);
@@ -53,8 +67,11 @@ class CachifyJS {
 
             if (this.postSync && this.postSync.syncInterval) {
                 const id = setInterval(async () => {
-                    await this.refreshData();
-                    this.postSync.callback( getData(this.key));
+                    const callSkip = this.checkCallSkip()
+                    if (!callSkip) {
+                        await this.refreshData();
+                        this.postSync.callback(getData(this.keyLS, this.encryption?.secretKey));
+                    }
                 }, toMs( this.postSync.syncInterval));
 
                 this.updateInterval(id);
@@ -63,13 +80,43 @@ class CachifyJS {
         return this.response;
     }
 
+    async get (config) {
+        this.setup(null, config);
+        this.updateKeyMap()
+        this.removeExpiredData()
+
+        return getData(this.keyLS, this.encryption?.secretKey);
+    }
+
+    async set (config, data) {
+        this.setup(null, config);
+        this.updateKeyMap()
+        this.removeExpiredData()
+        this.updateTimestamps()
+        setData(this.keyLS, data, this.encryption?.secretKey);
+        if (this.after) {
+            if (this.after.callback) {
+                this.after.callback( getData(this.keyLS, this.encryption?.secretKey));
+            }
+        }
+    }
+
+    async remove (config) {
+        this.setup(null, config);
+        this.updateKeyMap()
+        this.removeExpiredData()
+        removeData(this.keyLS);
+    }
+
     setup (axiosConfig, cacheConfig) {
         this.axiosConfig = axiosConfig;
         this.errorCallback = cacheConfig.errorCallback;
         this.lifetime = cacheConfig.lifetime ?? this.lifetime;
         this.preSync = cacheConfig.preSync;
         this.postSync = cacheConfig.postSync;
+        this.after = cacheConfig.after;
         this.key = cacheConfig.key;
+        this.encryption = cacheConfig.encryption ?? this.encryption;
         this.response = {};
     }
 
@@ -77,8 +124,8 @@ class CachifyJS {
         try {
             let response = await axios(this.axiosConfig);
             if (response.data) {
-                this.updateExpiration()
-                setData(this.key, response.data);
+                this.updateTimestamps()
+                setData(this.keyLS, response.data, this.encryption?.secretKey);
             } else {
                 throw new Error(response.response);
             }
@@ -92,55 +139,132 @@ class CachifyJS {
         }
     }
 
-    updateExpiration () {
+    updateKeyMap () {
+        const uniqueLSKey = LS_KEY_PREFIX + (new Date()).getTime()
+        const response = getData(MASTER_KEY, MASTER_ENC_KEY);
+        this.keyMap = response.nodata ? [] : response.data
+        this.removeUntrackedEncryptedData()
+
+        const filtered = this.keyMap.filter((item) => item.key == this.key);
+        if (filtered.length) {
+            this.keyLS = filtered[0].keyLS
+
+            if (this.encryption?.secretKey && this.keyLS == this.key) {
+                this.keyLS = uniqueLSKey
+                this.keyMap = this.keyMap.filter((item) => item.key != this.key)
+                filtered[0].keyLS = this.keyLS
+                this.keyMap.push(filtered[0]);
+
+                const response = getData(this.key)
+                removeData(this.key)
+                if (response.data) {
+                    setData(this.keyLS, response.data)
+                }
+            }
+        }
+        else {
+            this.keyLS = this.encryption?.secretKey ? uniqueLSKey : this.key
+            this.keyMap.push({ key: this.key, keyLS: this.keyLS});
+        }
+        setData(MASTER_KEY, this.keyMap, MASTER_ENC_KEY);
+        this.removeUntrackedNonEncryptedData()
+    }
+
+    removeUntrackedEncryptedData () {
+        const lsKeys = Object.keys(localStorage);
+        lsKeys.forEach(lsKey => {
+            if (lsKey.startsWith(LS_KEY_PREFIX)) {
+                const items = this.keyMap.filter(item => item.keyLS == lsKey)
+                if (!items.length) removeData(lsKey)
+            }
+        })
+    }
+
+    removeUntrackedNonEncryptedData () {
+        this.keyMap.forEach(item => {
+            if (item.key !== item.keyLS) removeData(item.key)
+        })
+    }
+
+    updateTimestamps () {
         const currentTime = (new Date()).getTime()
         const expiration = currentTime + toMs(this.lifetime)
 
-        let expirations = getData('expirations');
-        if (expirations.nodata) expirations = []
-        expirations = expirations.filter((item) => item.key != this.key);
-        expirations.push({ key: this.key, expiration });
-        setData('expirations', expirations);
+        const response = getData(MASTER_KEY, MASTER_ENC_KEY);
+        this.keyMap = response.nodata ? [] : response.data
+        let filtered = this.keyMap.filter((item) => item.key == this.key);
+        if (filtered.length) {
+            this.keyMap = this.keyMap.filter((item) => item.key != this.key)
+            filtered[0].updatedAt = currentTime
+            filtered[0].expiration = expiration
+            this.keyMap.push(filtered[0]);
+            setData(MASTER_KEY, this.keyMap, MASTER_ENC_KEY);
+        }
+        removeData(EXPIRATIONS_LS_KEY)//remove in next version
     }
 
     removeExpiredData () {
         const currentTime = (new Date()).getTime()
-        const oneHourBeforeTime = currentTime - (1000 * 60 * 60)
+        const oneHourBeforeTime = currentTime - toMs('1h')
 
-        let expirations = getData('expirations');
-        if (expirations.nodata) expirations = []
-        const filtered = expirations.filter((item) => (item.key===this.key && item.expiration <= currentTime || item.expiration <= oneHourBeforeTime));
+        const response = getData(MASTER_KEY, MASTER_ENC_KEY);
+        this.keyMap = response.nodata ? [] : response.data
+        const filtered = this.keyMap.filter((item) => (item.key===this.key && item.expiration <= currentTime || item.expiration <= oneHourBeforeTime));
         if (filtered.length) {
             filtered.forEach(exItem => {
-                expirations = expirations.filter((item) => exItem.key !== item.key);
+                this.keyMap = this.keyMap.filter((item) => exItem.key !== item.key);
                 removeData(exItem.key)
             })
-            setData('expirations', expirations);
+            setData(MASTER_KEY, this.keyMap, MASTER_ENC_KEY);
         }
+    }
+
+    checkCallSkip () {
+        if (!this.postSync?.skipApiCallFor) return false
+
+        const currentTime = (new Date()).getTime()
+        const skipFrom = currentTime - toMs(this.postSync.skipApiCallFor)
+
+        const response = getData(MASTER_KEY, MASTER_ENC_KEY);
+        this.keyMap = response.nodata ? [] : response.data
+        let filtered = this.keyMap.filter((item) => item.key === this.key);
+
+        if (!filtered.length) return false
+        if (!filtered[0].updatedAt) return false
+
+        return filtered[0].updatedAt > skipFrom;
     }
 
     updateInterval (id) {
-        let intervals = getData('intervals');
-        if(intervals.nodata) intervals = []
-        const filtered = intervals.filter((item) => item.key == this.key);
+        const response = getData(MASTER_KEY, MASTER_ENC_KEY);
+        this.keyMap = response.nodata ? [] : response.data
+        let filtered = this.keyMap.filter((item) => item.key == this.key);
         if (filtered.length) {
-            filtered.forEach((item) => clearInterval(item.interval));
-            intervals = intervals.filter((item) => item.key != this.key);
+            filtered.forEach((item) => {
+                if (item.interval != id) clearInterval(item.interval)
+            });
+            this.keyMap = this.keyMap.filter((item) => item.key != this.key)
+            filtered[0].interval = id
+            this.keyMap.push(filtered[0]);
+            setData(MASTER_KEY, this.keyMap, MASTER_ENC_KEY);
         }
-        intervals.push({ key: this.key, id });
-        setData('intervals', intervals);
+        removeData(INTERVALS_LS_KEY);//remove in next version
     }
 
     updateTimeout (id) {
-        let timeouts = getData('timeouts');
-        if(timeouts.nodata) timeouts = []
-        const filtered = timeouts.filter((item) => item.key == this.key);
+        const response = getData(MASTER_KEY, MASTER_ENC_KEY);
+        this.keyMap = response.nodata ? [] : response.data
+        let filtered = this.keyMap.filter((item) => item.key == this.key);
         if (filtered.length) {
-            filtered.forEach((item) => clearTimeout(item.timeout));
-            timeouts = timeouts.filter((item) => item.key != this.key);
+            filtered.forEach((item) => {
+                if (item.timeout != id) clearTimeout(item.timeout)
+            });
+            this.keyMap = this.keyMap.filter((item) => item.key != this.key)
+            filtered[0].timeout = id
+            this.keyMap.push(filtered[0]);
+            setData(MASTER_KEY, this.keyMap, MASTER_ENC_KEY);
         }
-        timeouts.push({ key: this.key, id });
-        setData('timeouts', timeouts);
+        removeData(TIMEOUTS_LS_KEY);//remove in next version
     }
 };
-export default CachifyJS;
+export default CachifyCore;

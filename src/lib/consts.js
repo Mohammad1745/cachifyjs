@@ -1,0 +1,6 @@
+export const MASTER_KEY = 'cFYmRk'
+export const MASTER_ENC_KEY = 'cFYmRkeN'
+export const LS_KEY_PREFIX = 'cFYd'
+export const TIMEOUTS_LS_KEY = 'cFYtTs'
+export const INTERVALS_LS_KEY = 'cFYIvS'
+export const EXPIRATIONS_LS_KEY = 'cFYeTS'
