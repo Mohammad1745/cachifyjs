@@ -6,7 +6,7 @@ performance of your frontend application built on any technology like: react, vu
 
 <p id="installation"></p>
 
-## Installation 
+## Installation
 
 ```
 npm install cachifyjs
@@ -14,7 +14,7 @@ npm install cachifyjs
 
 <p id="table_of_contents"></p>
 
-## Table of Contents 
+## Table of Contents
 - [What's new! (v2.3)](#whats_new)
 - [Guides](#guides)
     - [Caching API Response](#caching_api_responses)
@@ -67,14 +67,14 @@ npm install cachifyjs
 
 <p id="guides"></p>
 
-## Guides 
+## Guides
 
 <p id="caching_api_responses"></p>
 
-### 1. Caching API Response: 
+### 1. Caching API Response:
 
 To use CachifyJS, import the `cachify` function into your JavaScript file and pass your API call to it. The `cachify` function
-will first check if the API response is already cached in local storage. If it is, it will return the cached data inside a 
+will first check if the API response is already cached in local storage. If it is, it will return the cached data inside a
 wrapper (ex: {data: cachedData}), make the api call, cache the response data and run the callback. If not, it will make
 the API call, cache the response data in local storage and return the data.
 
@@ -136,7 +136,7 @@ function handleError (error) {
 
 <p id="caching_api_responses_notes"></p>
 
-#### Notes 
+#### Notes
 
 - `handleResponse`: The function has been used as `callback` in `postSync` property and also been used to handle the `response` of api call.
 - `handleError`: The function has been used as `errorCallback` in `cacheConfig` and also been used to handle the `error` on api call.
@@ -145,7 +145,7 @@ function handleError (error) {
 
 <p id="caching_api_responses_configuration"></p>
 
-#### Configuration 
+#### Configuration
 
 When using CachifyJS, you can configure various options to customize the caching behavior. The `cacheConfig` object passed to the `cachify` function accepts the following properties:
 
@@ -167,9 +167,9 @@ When using CachifyJS, you can configure various options to customize the caching
 - `postSync`: (recommended) An object that defines how the cache should be updated after the API response is returned. This is useful when you want to keep the cache up to date with new data periodically.
 
     - `callback`: (required) A callback function that will be called with the cached data with a wrapper (ex: `{data: cachedData}`) after it has been cached.
-      
+
     - `skipApiCallFor`: (optional) The amount of time to skip api call. If any api call is made too frequently and we want to reduce the call, we may use this configuration. Then any call
-       to `cachify()` function with give data from cache without api call withing this time period.
+      to `cachify()` function with give data from cache without api call withing this time period.
 
     - `syncTimeout`: (optional) The amount of time to wait before syncing the cache with new data. This is useful if you want to avoid syncing the cache too frequently.
       It's a one time call.
@@ -178,7 +178,7 @@ When using CachifyJS, you can configure various options to customize the caching
 
 <p id="caching_api_responses_scenarios"></p>
 
-#### Scenarios 
+#### Scenarios
 
 1. `Plain`: `CachifyJS` will try to get data from cache. If data found, no api call will be made. Otherwise, it will make the api call, cache the data and return the cached data inside a wrapper.
    It's recommended to use `lifetime` for this case. After the cache being expired, new api call will be made to get fresh data.
@@ -208,6 +208,10 @@ When using CachifyJS, you can configure various options to customize the caching
    If `syncInterval` is present in the config, `cachifyjs` will make api call according to the `syncInterval` value and return the response.
 
    Data will be cached in both scenarios.
+
+   If the api call is requested according to `syncTimeout` or `syncInterval` during skip timezone and cache data is present them the api call will simply 
+   be ignored and the cache data will be returned.
+
     ```
     const cacheConfig = {
         key: `product/list?status=active`,
@@ -229,11 +233,11 @@ When using CachifyJS, you can configure various options to customize the caching
 
 <p id="set_cached_data"></p>
 
-### 2. Set Cached Data: 
+### 2. Set Cached Data:
 
 The `setCache` function allows you to set new cached data in your frontend application. The data could be api response, any app state, you name it.
 With this new feature, you can easily set any data in the cache without depending on any type of network request or API call.
-To set cached data, import the `setCache` function into your JavaScript file and pass a `config` and `data` to the function. 
+To set cached data, import the `setCache` function into your JavaScript file and pass a `config` and `data` to the function.
 The function will  set new data in cache.
 
 Here's an example:
@@ -267,7 +271,7 @@ function handleResponse (response) {
 
 <p id="set_cached_data_configuration"></p>
 
-#### Configuration 
+#### Configuration
 
 When setting new data, the `config` object passed to the `setCache` function accepts the following properties:
 
@@ -346,9 +350,9 @@ When getting data, the `config` object passed to the `getCache` function accepts
 
 <p id="update_cached_data"></p>
 
-### 4. Update Cached Data: 
+### 4. Update Cached Data:
 
-To update cached data, import the `updateCache` function into your JavaScript file and pass a `config` and `data` to the 
+To update cached data, import the `updateCache` function into your JavaScript file and pass a `config` and `data` to the
 function. The function will  update the cached data in frontend without making api call.
 
 Here's an example:
@@ -382,13 +386,13 @@ function handleResponse (response) {
 ```
 <p id="update_cached_data_notes"></p>
 
-#### Notes 
+#### Notes
 
 - `handleResponse`: The function has been used to handle the api response previously. This callback will be called after the data has been updated.
 
 <p id="update_cached_data_configuration"></p>
 
-#### Configuration 
+#### Configuration
 
 When updating data, the `config` object passed to the `updateCache` function accepts the following properties:
 
@@ -404,12 +408,12 @@ When updating data, the `config` object passed to the `updateCache` function acc
 - `after`: (recommended) An object that defines the events after the data has been updated. This is useful when you want create an effect after the update.
 
     - `callback`: (required) A callback function that will be called after the data has been updated. It should be the same method that was previously passed in
-       cacheConfig during initial caching.
+      cacheConfig during initial caching.
 
 
 <p id="remove_cached_data"></p>
 
-### 5. Remove Cached Data: 
+### 5. Remove Cached Data:
 
 To remove cached data, import the `removeCache` function into your JavaScript file and pass a `config` with the `key` property to the function.
 The function will remove the cached data.
@@ -435,29 +439,33 @@ async function removeProductListCache () {
 
 ## Change Log (v2.3)
 
+- Version `2.3.10` (2023-07-15)
+
+    - Dependency version update: cachify@2.3.10 requires axios@1.4.0.
+
 - Version `2.3.9` (2023-06-30)
 
-  - The skip api call feature has been updated to check previous api call timestamp and determine the skip functionality.
+    - Skip Api Call: The skip api call feature has been updated to check previous api call timestamp and determine the skip functionality.
 
 - Version `2.3.8` (2023-06-28)
 
-  - Skip Api Call: The `skipApiCallFor` property inside `postSync` property of `cacheConfig` for function `cachify()` allows
-    us to skip api calls. If any api call is made too frequently and we want to reduce the call, we may use this configuration.
+    - Skip Api Call: The `skipApiCallFor` property inside `postSync` property of `cacheConfig` for function `cachify()` allows
+      us to skip api calls. If any api call is made too frequently and we want to reduce the call, we may use this configuration.
 
 - Version `2.3.7` (2023-06-19)
 
-  - Fixed the issue: Not calling api if data is cached even if `postsync` is enabled.
+    - Fixed the issue: Not calling api if data is cached even if `postsync` is enabled.
 
 
 <p id="dependencies"></p>
 
-## Dependencies 
+## Dependencies
 
 [Axios](https://www.npmjs.com/package/axios), [Crypto-JS](https://www.npmjs.com/package/crypto-js)
 
 <p id="conclusion"></p>
 
-## Conclusion 
+## Conclusion
 
 CachifyJS is a simple yet powerful tool that can help you optimize your frontend application's performance
 by reducing the number of API requests. By caching API responses in the browser's local storage,

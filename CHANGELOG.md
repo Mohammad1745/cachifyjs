@@ -1,6 +1,10 @@
+## Version 2.3.10 - 2023-07-15
+
+- Dependency version update: cachify@2.3.10 requires axios@1.4.0.
+
 ## Version 2.3.9 - 2023-06-30
 
-- The skip api call feature has been updated to check previous api call timestamp and determine the skip functionality.
+- Skip Api Call: The skip api call feature has been updated to check previous api call timestamp and determine the skip functionality.
 
 ## Version 2.3.8 - 2023-06-28
 
